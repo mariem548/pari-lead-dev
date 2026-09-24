@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS bets (
   round_id UUID NOT NULL REFERENCES rounds(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   value NUMERIC NOT NULL,
+  avatar TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

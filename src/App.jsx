@@ -9,6 +9,24 @@ import {
   formatTime,
 } from './lib/api'
 
+// === Avatars ===
+const AVATARS = [
+  { emoji: '🤺', name: 'Chevalier' },
+  { emoji: '🏹', name: 'Archer' },
+  { emoji: '🧙', name: 'Mage' },
+  { emoji: '👑', name: 'Roi' },
+  { emoji: '🛡️', name: 'Garde' },
+  { emoji: '⚔️', name: 'Guerrier' },
+  { emoji: '🗡️', name: 'Assassin' },
+  { emoji: '📜', name: 'Scribe' },
+  { emoji: '🏰', name: 'Seigneur' },
+  { emoji: '🐉', name: 'Dragonnier' },
+  { emoji: '🔥', name: 'Pyromancien' },
+  { emoji: '🌙', name: 'Sorcière' },
+]
+
+const AVATAR_KEY = 'pari-lead-dev-avatar'
+
 // === Story popup ===
 const STORY_KEY = 'pari-lead-dev-story-seen'
 
@@ -91,6 +109,13 @@ export default function App() {
       return ''
     }
   })
+  const [userAvatar, setUserAvatar] = useState(() => {
+    try {
+      return sessionStorage.getItem(AVATAR_KEY) || ''
+    } catch {
+      return ''
+    }
+  })
 
   function closeStory() {
     setShowStory(false)
@@ -142,9 +167,9 @@ export default function App() {
     }
   }
 
-  async function addBet(roundId, name, valueStr, type) {
+  async function addBet(roundId, name, valueStr, type, avatar) {
     try {
-      const bet = await api.addBet(roundId, name, valueStr, type, userName || null)
+      const bet = await api.addBet(roundId, name, valueStr, type, avatar)
       if (bet) {
         setRounds((prev) =>
           prev.map((r) =>
@@ -334,6 +359,11 @@ export default function App() {
               key={round.id}
               round={round}
               onAddBet={addBet}
+              userAvatar={userAvatar}
+              setUserAvatar={(a) => {
+                setUserAvatar(a)
+                try { sessionStorage.setItem(AVATAR_KEY, a) } catch {}
+              }}
               onRemoveBet={removeBet}
               onClose={closeRound}
               onReopen={reopenRound}
@@ -354,6 +384,7 @@ export default function App() {
               {leaderboard.map((entry, i) => (
                 <div key={entry.name} className={`leaderboard-item rank-${i + 1}`}>
                   <div className="leaderboard-rank">{i + 1}</div>
+                  <span className="leaderboard-avatar">{entry.avatar || '🛡️'}</span>
                   <div className="leaderboard-name">{entry.name}</div>
                   <div className="leaderboard-score">
                     {entry.score} pt{entry.score > 1 ? 's' : ''}
@@ -458,7 +489,7 @@ function NewRoundForm({ onCreate }) {
 }
 
 // === Round Card ===
-function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }) {
+function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, userAvatar, setUserAvatar }) {
   const [betName, setBetName] = useState('')
   const [betValue, setBetValue] = useState('')
   const [actualInput, setActualInput] = useState(round.actualInput || '')
@@ -475,7 +506,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
       return
     }
     setError('')
-    onAddBet(round.id, betName, betValue, round.type)
+    onAddBet(round.id, betName, betValue, round.type, userAvatar)
     setBetName('')
     setBetValue('')
   }
@@ -538,6 +569,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
                 className={`bet-item ${isWinner ? (isTied ? 'is-tied' : 'is-winner') : ''}`}
               >
                 <div className="bet-item-left">
+                  <span className="bet-item-avatar">{bet.avatar || '🛡️'}</span>
                   <span className="bet-item-name">{bet.name}</span>
                   <span className="bet-item-value">{formatValue(bet.value)}</span>
                 </div>
@@ -570,6 +602,18 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
       {isOpen && (
         <>
           <div className="add-bet-form">
+            <div className="avatar-picker">
+              {AVATARS.map((a) => (
+                <button
+                  key={a.emoji}
+                  className={`avatar-btn ${userAvatar === a.emoji ? 'selected' : ''}`}
+                  onClick={() => setUserAvatar(a.emoji)}
+                  title={a.name}
+                >
+                  {a.emoji}
+                </button>
+              ))}
+            </div>
             <input
               type="text"
               placeholder="Prénom"

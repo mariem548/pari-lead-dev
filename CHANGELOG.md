@@ -6,7 +6,13 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-## [Unreleased]
+## [1.5.0] - 2026-09-24
+
+### Added
+- Avatars médiévaux : chaque joueur choisit un avatar (chevalier, archer, mage, roi, etc.)
+- Les avatars s'affichent à côté des prénoms dans les paris et le classement
+- 12 avatars disponibles avec sélecteur visuel
+- Colonne `avatar` dans la table Supabase `bets`
 
 ### Removed
 - Nettoyage des restes du système de mot de passe (RPC, table app_config)

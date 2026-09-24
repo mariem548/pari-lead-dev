@@ -68,7 +68,7 @@ export function computeLeaderboard(rounds) {
   rounds.forEach((round) => {
     if (round.status !== 'closed' || !round.winners) return
     round.bets.forEach((bet) => {
-      if (!scores[bet.name]) scores[bet.name] = { name: bet.name, score: 0, wins: 0 }
+      if (!scores[bet.name]) scores[bet.name] = { name: bet.name, score: 0, wins: 0, avatar: bet.avatar || null }
       if (round.winners.includes(bet.id)) {
         scores[bet.name].score += round.pointsPerWin || 1
         scores[bet.name].wins += 1
@@ -132,7 +132,7 @@ function mapRound(row) {
       id: b.id,
       name: b.name,
       value: Number(b.value),
-      createdBy: b.created_by || null,
+      avatar: b.avatar || null,
     })),
     actualValue: row.actual_value !== null ? Number(row.actual_value) : null,
     actualInput: row.actual_input || '',
@@ -170,7 +170,7 @@ async function createRoundSupabase(name, type) {
   return mapRound(data)
 }
 
-async function addBetSupabase(roundId, name, valueStr, type, createdBy) {
+async function addBetSupabase(roundId, name, valueStr, type, avatar) {
   const value = type === 'time' ? parseTime(valueStr) : parseNumber(valueStr)
   if (value === null) throw new Error('Invalid value')
 
@@ -181,13 +181,13 @@ async function addBetSupabase(roundId, name, valueStr, type, createdBy) {
       round_id: roundId,
       name: name.trim(),
       value: value,
-      created_by: createdBy || null,
+      avatar: avatar || null,
     })
     .select()
     .single()
 
   if (error) throw error
-  return { id: data.id, name: data.name, value: Number(data.value), createdBy: data.created_by }
+  return { id: data.id, name: data.name, value: Number(data.value), avatar: data.avatar }
 }
 
 async function removeBetSupabase(roundId, betId) {
@@ -278,9 +278,9 @@ export const api = {
     return round
   },
 
-  async addBet(roundId, name, valueStr, type, createdBy) {
+  async addBet(roundId, name, valueStr, type, avatar) {
     if (isSupabaseConfigured) {
-      return addBetSupabase(roundId, name, valueStr, type, createdBy)
+      return addBetSupabase(roundId, name, valueStr, type, avatar)
     }
     // localStorage
     const data = loadLocal()
@@ -288,7 +288,7 @@ export const api = {
     if (!round) return null
     const value = type === 'time' ? parseTime(valueStr) : parseNumber(valueStr)
     if (value === null) return null
-    const bet = { id: genId(), name: name.trim(), value, createdBy: createdBy || null }
+    const bet = { id: genId(), name: name.trim(), value, avatar: avatar || null }
     round.bets.push(bet)
     saveLocal(data)
     return bet

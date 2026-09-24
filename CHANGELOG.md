@@ -6,18 +6,20 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-## [Unreleased]
-
-### Changed
-- Logo personnalisé SVG : chevalier protégeant un royaume avec "GIT" inscrit sur le château
-- Favicon mis à jour avec le même design
-
 ## [1.8.0] - 2026-09-24
 
 ### Added
 - Série de victoires : affichage des streaks dans le classement (ex: 🔥 3)
 - Badge animé pour les joueurs en série
 - Suivi des séries courantes et meilleures séries
+- `computeHallOfFame` ajouté à l'API pour les futures fonctionnalités
+
+### Changed
+- Logo personnalisé SVG : chevalier protégeant un royaume avec "GIT" inscrit sur le château
+- Favicon mis à jour avec le même design
+
+### Fixed
+- Renommage Myriam en Mariem dans la popup et le README
 
 ### Added
 - Graphique de distribution des paris : visualise où tout le monde a parié avec des barres

@@ -6,6 +6,25 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [3.0.0] - 2026-09-25
+
+### Added — 12 nouvelles fonctionnalités médiévales
+- Titres de noblesse automatiques selon le score (Vilain → Souverain)
+- Trophées drôles (Pile à l'heure, Prophète du café, etc.)
+- Coffre aux exploits avec trophées débloquables/verrouillés
+- Quêtes quotidiennes (Oracle précis, Double couronne)
+- Punchlines royales aléatoires à la clôture des paris
+- Calendrier des retards avec code couleur
+- Tournoi mensuel avec podium et champion
+- Parchemin partageable (copie pour Slack/Teams)
+- Animation banquet (trompettes) à l'ouverture du Parchemin Royal
+- Joutes entre les 2 meilleurs joueurs
+- Météo du royaume dynamique selon l'heure d'arrivée
+- Animations d'entrée par avatar (fumée magique, flèche, galop, couronne)
+
+### Removed
+- Animation du chevalier sur son cheval (supprimée par demande utilisateur)
+
 ## [2.6.0] - 2026-09-25
 
 ### Added

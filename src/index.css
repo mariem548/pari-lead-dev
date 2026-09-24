@@ -374,15 +374,13 @@ a, button, input, select {
 .logo {
   width: 48px;
   height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-gold));
-  border-radius: var(--radius-md);
-  font-size: 1.5rem;
   flex-shrink: 0;
-  box-shadow: var(--shadow-md);
-  border: 2px solid var(--color-gold);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+
+.logo-svg {
+  width: 48px;
+  height: 48px;
 }
 
 .header h1 {
@@ -809,6 +807,22 @@ input::placeholder {
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
   color: var(--color-primary);
+}
+
+.streak-badge {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-error);
+  background: var(--color-error-highlight);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  animation: flicker 1.5s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .leaderboard-empty {

@@ -255,7 +255,7 @@ export default function App() {
       <div className="app">
         <header className="header">
           <div className="header-left">
-            <div className="logo">🛡️</div>
+            <Logo />
             <div>
               <h1>Pari Lead Dev</h1>
               <p>Paris d'équipe</p>
@@ -276,7 +276,7 @@ export default function App() {
       {/* Header */}
       <header className="header">
         <div className="header-left">
-          <div className="logo">🎯</div>
+          <Logo />
           <div>
             <h1>Pari Lead Dev</h1>
             <p>Paris d'équipe {isSupabaseConfigured ? '— partagé' : ''}</p>
@@ -386,6 +386,9 @@ export default function App() {
                   <div className="leaderboard-rank">{i + 1}</div>
                   <span className="leaderboard-avatar">{entry.avatar || '🛡️'}</span>
                   <div className="leaderboard-name">{entry.name}</div>
+                  {entry.currentStreak >= 2 && (
+                    <span className="streak-badge">🔥 {entry.currentStreak}</span>
+                  )}
                   <div className="leaderboard-score">
                     {entry.score} pt{entry.score > 1 ? 's' : ''}
                   </div>

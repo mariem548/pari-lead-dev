@@ -68,14 +68,42 @@ export function computeLeaderboard(rounds) {
   rounds.forEach((round) => {
     if (round.status !== 'closed' || !round.winners) return
     round.bets.forEach((bet) => {
-      if (!scores[bet.name]) scores[bet.name] = { name: bet.name, score: 0, wins: 0, avatar: bet.avatar || null }
+      if (!scores[bet.name]) scores[bet.name] = { name: bet.name, score: 0, wins: 0, losses: 0, avatar: bet.avatar || null, currentStreak: 0, bestStreak: 0 }
       if (round.winners.includes(bet.id)) {
         scores[bet.name].score += round.pointsPerWin || 1
         scores[bet.name].wins += 1
+        scores[bet.name].currentStreak += 1
+        scores[bet.name].bestStreak = Math.max(scores[bet.name].bestStreak, scores[bet.name].currentStreak)
+      } else {
+        scores[bet.name].losses += 1
+        scores[bet.name].currentStreak = 0
       }
     })
   })
   return Object.values(scores).sort((a, b) => b.score - a.score || b.wins - a.wins)
+}
+
+export function computeHallOfFame(rounds) {
+  const entries = []
+  rounds.forEach((round) => {
+    if (round.status !== 'closed' || round.actualValue === null || round.actualValue === undefined) return
+    round.bets.forEach((bet) => {
+      const diff = Math.abs(bet.value - round.actualValue)
+      const isWinner = round.winners && round.winners.includes(bet.id)
+      entries.push({
+        name: bet.name,
+        avatar: bet.avatar || null,
+        roundName: round.name,
+        value: bet.value,
+        actualValue: round.actualValue,
+        diff,
+        type: round.type,
+        isWinner,
+        createdAt: round.createdAt,
+      })
+    })
+  })
+  return entries.sort((a, b) => a.diff - b.diff).slice(0, 5)
 }
 
 // === Date helpers ===

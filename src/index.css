@@ -1419,6 +1419,279 @@ input::placeholder {
   cursor: default;
 }
 
+/* === Delay Calendar === */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
+  margin: var(--space-4) 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  cursor: default;
+  gap: 2px;
+}
+
+.calendar-day.has-delay {
+  border-color: var(--color-gold);
+}
+
+.calendar-day.delay-late {
+  background: rgba(180, 80, 80, 0.15);
+  border-color: rgba(180, 80, 80, 0.4);
+}
+
+.calendar-day.delay-medium {
+  background: rgba(200, 160, 80, 0.12);
+  border-color: rgba(200, 160, 80, 0.3);
+}
+
+.calendar-day.delay-early {
+  background: rgba(100, 180, 100, 0.1);
+  border-color: rgba(100, 180, 100, 0.3);
+}
+
+.calendar-day-num {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.calendar-day-icon {
+  font-size: 0.7rem;
+}
+
+/* === Daily Quests === */
+.quests-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+}
+
+.quest-item.done {
+  background: var(--color-gold-highlight);
+  border: 2px solid var(--color-gold);
+}
+
+.quest-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* === Royal Punchlines === */
+.kingdom-punchline {
+  font-family: 'Cinzel', serif;
+  font-style: italic;
+  color: var(--color-text-muted);
+  text-align: center;
+  font-size: var(--text-sm);
+  margin: var(--space-2) 0;
+}
+
+/* === Kingdom Weather === */
+.kingdom-weather {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.weather-icon {
+  font-size: 1.8rem;
+}
+
+.weather-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-family: 'Cinzel', serif;
+}
+
+.weather-sunny .kingdom-map { background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,165,0,0.05)); }
+.weather-cloudy .kingdom-map { background: linear-gradient(135deg, rgba(150,150,180,0.05), rgba(100,100,140,0.05)); }
+.weather-rain .kingdom-map { background: linear-gradient(135deg, rgba(70,130,180,0.08), rgba(50,100,160,0.08)); }
+.weather-storm .kingdom-map { background: linear-gradient(135deg, rgba(60,60,80,0.1), rgba(40,40,60,0.1)); }
+
+/* === Monthly Tournament === */
+.tournament-card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+  text-align: center;
+}
+
+.tournament-podium {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  min-width: 80px;
+}
+
+.podium-item.rank-1 {
+  background: var(--color-gold-highlight);
+  border: 2px solid var(--color-gold);
+  order: 2;
+  padding-top: var(--space-5);
+}
+
+.podium-item.rank-2 {
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+  order: 1;
+}
+
+.podium-item.rank-3 {
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+  order: 3;
+}
+
+.podium-avatar {
+  font-size: 2rem;
+}
+
+.podium-name {
+  font-weight: 600;
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-sm);
+}
+
+.podium-wins {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.tournament-champion {
+  font-family: 'Cinzel', serif;
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+}
+
+/* === Banquet Animation === */
+.banquet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--space-4);
+  z-index: 9999;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
+}
+
+.banquet-trumpet {
+  font-size: 4rem;
+  animation: banquet-fanfare 0.5s ease-in-out infinite alternate;
+}
+
+.banquet-trumpet-2 {
+  animation-delay: 0.25s;
+}
+
+@keyframes banquet-fanfare {
+  0% { transform: rotate(-15deg) scale(1); }
+  100% { transform: rotate(15deg) scale(1.1); }
+}
+
+.banquet-text {
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-xl);
+  color: var(--color-gold);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  animation: banquet-pop 0.3s ease-out;
+}
+
+@keyframes banquet-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* === Player Joust === */
+.joust-card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.joust-card h3 {
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.joust-arena {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.joust-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.joust-avatar {
+  font-size: 2.5rem;
+}
+
+.joust-name {
+  font-weight: 600;
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-sm);
+}
+
+.joust-score {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+}
+
+.joust-vs {
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
 /* === Achievement Chest === */
 .achievement-modal {
   max-width: 520px;

@@ -287,7 +287,7 @@ export default function App() {
       triggerConfetti()
       playSound('win')
       if (winnerNames.length > 0) {
-        showToast(`🏆 ${winnerNames.join(', ')} ${winnerNames.length > 1 ? 'gagnent' : 'gagne'} !`, 'success')
+        showToast(`🏆 ${winnerNames.join(', ')} ${winnerNames.length > 1 ? 'gagnent' : 'gagne'} ! ${getPunchline()}`, 'success')
       }
     } catch (e) {
       setError('Erreur: ' + e.message)
@@ -575,6 +575,7 @@ export default function App() {
           onPlayerClick={setProfilePlayer}
           rounds={rounds}
           onOpenHallOfFame={() => setShowHallOfFame(true)}
+          userName={userName}
         />
       )}
     </div>
@@ -1084,7 +1085,7 @@ function ConfettiOverlay() {
 }
 
 // === Monthly Recap (Parchemin Royal) ===
-function MonthlyRecap({ rounds }) {
+function MonthlyRecap({ rounds, onOpenBanquet }) {
   const [show, setShow] = useState(false)
   const [recapSeen, setRecapSeen] = useState(() => {
     try {
@@ -1111,6 +1112,7 @@ function MonthlyRecap({ rounds }) {
       sessionStorage.setItem('pari-lead-dev-recap-seen', String(month))
     } catch {}
     setRecapSeen(true)
+    if (onOpenBanquet) onOpenBanquet()
   }
 
   if (!recap) return null
@@ -1200,6 +1202,10 @@ function MonthlyRecap({ rounds }) {
               </div>
             </div>
 
+            <div style={{ textAlign: 'center', marginTop: 'var(--space-4)' }}>
+              <ShareableParchment recap={recap} monthName={monthName} />
+            </div>
+
             <button className="btn btn-primary recap-close-btn" onClick={() => setShow(false)}>
               ⚔️ Fermer le parchemin
             </button>
@@ -1227,6 +1233,332 @@ function getMedievalTitle(score) {
     if (score >= t.min) result = t
   }
   return result
+}
+
+// === Delay Calendar ===
+function DelayCalendar({ rounds }) {
+  const [show, setShow] = useState(false)
+
+  const monthDays = useMemo(() => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth()
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+    const days = []
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d)
+      const dateStr = date.toDateString()
+      const dayRounds = rounds.filter((r) => {
+        if (!r.closedAt) return false
+        return new Date(r.closedAt).toDateString() === dateStr
+      })
+      let maxHour = null
+      let winners = []
+      dayRounds.forEach((r) => {
+        if (r.type === 'time' && r.actualValue !== null) {
+          const h = r.actualValue / 60
+          if (maxHour === null || h > maxHour) maxHour = h
+          winners = r.winners || []
+        }
+      })
+      days.push({ date, day: d, maxHour, winners, rounds: dayRounds.length })
+    }
+    return days
+  }, [rounds])
+
+  return (
+    <>
+      <button className="btn btn-secondary" onClick={() => setShow(true)}>
+        📅 Calendrier des retards
+      </button>
+      {show && (
+        <div className="modal-overlay" onClick={() => setShow(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShow(false)}>✕</button>
+            <h2>📅 Calendrier des Retards</h2>
+            <p className="modal-subtitle">{new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
+            <div className="calendar-grid">
+              {monthDays.map((d) => (
+                <div
+                  key={d.day}
+                  className={`calendar-day ${d.maxHour !== null ? 'has-delay' : ''} ${d.maxHour >= 11 ? 'delay-late' : d.maxHour >= 10 ? 'delay-medium' : d.maxHour !== null ? 'delay-early' : ''}`}
+                  title={d.maxHour !== null ? `${d.date.toLocaleDateString('fr-FR')} - Arrivee: ${Math.floor(d.maxHour)}h${Math.round((d.maxHour % 1) * 60).toString().padStart(2, '0')}` : d.date.toLocaleDateString('fr-FR')}
+                >
+                  <span className="calendar-day-num">{d.day}</span>
+                  {d.maxHour !== null && (
+                    <span className="calendar-day-icon">
+                      {d.maxHour >= 11 ? '⛈️' : d.maxHour >= 10 ? '🌧️' : '☀️'}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+// === Daily Quests ===
+function DailyQuests({ rounds, userName }) {
+  const [show, setShow] = useState(false)
+
+  const quests = useMemo(() => {
+    const today = new Date().toDateString()
+    const todayRounds = rounds.filter((r) => {
+      const d = new Date(r.createdAt || r.closedAt)
+      return d.toDateString() === today && r.actualValue !== null
+    })
+
+    const playerBets = []
+    todayRounds.forEach((r) => {
+      r.bets.forEach((b) => {
+        if (b.name === userName) {
+          playerBets.push({ ...b, actualValue: r.actualValue })
+        }
+      })
+    })
+
+    const winners = todayRounds.flatMap((r) =>
+      (r.winners || []).map((w) => {
+        const bet = r.bets.find((b) => b.id === w)
+        return bet ? bet.name : null
+      })
+    )
+
+    // Check consecutive wins
+    let streak = 0
+    const sortedRounds = [...todayRounds].sort((a, b) =>
+      new Date(a.closedAt) - new Date(b.closedAt)
+    )
+    for (const r of sortedRounds) {
+      const roundWinners = (r.winners || []).map((w) => {
+        const bet = r.bets.find((b) => b.id === w)
+        return bet ? bet.name : null
+      })
+      if (roundWinners.includes(userName)) {
+        streak++
+      } else {
+        break
+      }
+    }
+
+    return [
+      {
+        icon: '🎯',
+        name: 'Oracle precis',
+        desc: 'Predire a moins de 5 minutes',
+        done: playerBets.some((b) => Math.abs(b.value - b.actualValue) <= 5),
+      },
+      {
+        icon: '👑',
+        name: 'Double couronne',
+        desc: 'Gagner 2 fois de suite',
+        done: streak >= 2,
+      },
+    ]
+  }, [rounds, userName])
+
+  if (!userName) return null
+
+  return (
+    <>
+      <button className="btn btn-secondary" onClick={() => setShow(true)}>
+        ⚔️ Quetes du jour ({quests.filter((q) => q.done).length}/{quests.length})
+      </button>
+      {show && (
+        <div className="modal-overlay" onClick={() => setShow(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShow(false)}>✕</button>
+            <h2>⚔️ Quetes du Jour</h2>
+            <p className="modal-subtitle">Challenges de {userName}</p>
+            <div className="quests-list">
+              {quests.map((q, i) => (
+                <div key={i} className={`quest-item ${q.done ? 'done' : ''}`}>
+                  <span className="quest-icon">{q.done ? '✅' : q.icon}</span>
+                  <div>
+                    <strong>{q.name}</strong>
+                    <p>{q.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+// === Royal Punchlines ===
+const ROYAL_PUNCHLINES = [
+  'Le roi a parle, les devins tremblent !',
+  'Que la fortune vous sourie, noble devin.',
+  'L\'heure du jugement a sonne !',
+  'Le sort en est jete, les paris sont clos.',
+  'Aujourd\'hui, la providence a choisi son champion.',
+  'Les astres ont parle, les taverne se taisent.',
+  'Le banquier du royaume a rendu son verdict.',
+  'La couronne du devin brille de mille feux !',
+  'Un nouveau prophetes entre dans la legende.',
+  'Les hirondelles annoncent une grande victoire.',
+]
+
+function getPunchline() {
+  return ROYAL_PUNCHLINES[Math.floor(Math.random() * ROYAL_PUNCHLINES.length)]
+}
+
+// === Monthly Tournament ===
+function MonthlyTournament({ rounds }) {
+  const monthRounds = useMemo(() => {
+    const now = new Date()
+    return rounds.filter((r) => {
+      if (!r.closedAt) return false
+      const d = new Date(r.closedAt)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+  }, [rounds])
+
+  const monthName = new Date().toLocaleDateString('fr-FR', { month: 'long' })
+
+  const tournamentLeaderboard = useMemo(() => {
+    const stats = {}
+    monthRounds.forEach((r) => {
+      (r.winners || []).forEach((w) => {
+        const bet = r.bets.find((b) => b.id === w)
+        if (!bet) return
+        if (!stats[bet.name]) stats[bet.name] = { name: bet.name, avatar: bet.avatar, wins: 0 }
+        stats[bet.name].wins++
+      })
+    })
+    return Object.values(stats).sort((a, b) => b.wins - a.wins)
+  }, [monthRounds])
+
+  if (tournamentLeaderboard.length === 0) return null
+
+  const champion = tournamentLeaderboard[0]
+
+  return (
+    <div className="tournament-card">
+      <h3>🏆 Tournoi de {monthName}</h3>
+      <div className="tournament-podium">
+        {tournamentLeaderboard.slice(0, 3).map((p, i) => (
+          <div key={p.name} className={`podium-item rank-${i + 1}`}>
+            <span className="podium-avatar">{p.avatar || '🛡️'}</span>
+            <span className="podium-name">{p.name}</span>
+            <span className="podium-wins">{p.wins} victoire{p.wins > 1 ? 's' : ''}</span>
+          </div>
+        ))}
+      </div>
+      {champion && (
+        <p className="tournament-champion">
+          👑 Champion: {champion.avatar} {champion.name} avec {champion.wins} victoire{champion.wins > 1 ? 's' : ''} !
+        </p>
+      )}
+    </div>
+  )
+}
+
+// === Shareable Parchment ===
+function ShareableParchment({ recap, monthName }) {
+  const [copied, setCopied] = useState(false)
+
+  function copyParchment() {
+    const text = `📜 Parchemin Royal - ${monthName}
+
+🐌 Arrivée la plus tardive: ${formatDate(recap.latest.round.closedAt)} à ${formatTime(recap.latest.round.actualValue)}
+   Gagnant: ${recap.latest.winners.map((w) => w.name).join(', ')}
+
+⚡ Arrivée la plus tôt: ${formatDate(recap.earliest.round.closedAt)} à ${formatTime(recap.earliest.round.actualValue)}
+   Gagnant: ${recap.earliest.winners.map((w) => w.name).join(', ')}
+
+👑 Grand Oracle: ${recap.topPredictor?.name} (${recap.topPredictor?.wins} victoires)
+🎯 Prédiction la plus précise: ${recap.bestBet?.name} (${recap.bestBet?.diff} min)
+📊 Total: ${recap.totalRounds} paris - Moyenne: ${formatTime(recap.avgArrival)}
+
+Via Pari Lead Dev`
+
+    try {
+      navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {}
+  }
+
+  return (
+    <button className="btn btn-primary" onClick={copyParchment}>
+      {copied ? '✅ Copie !' : '📋 Copier le parchemin'}
+    </button>
+  )
+}
+
+// === Banquet Animation ===
+function BanquetAnimation({ trigger }) {
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    if (trigger) {
+      setActive(true)
+      setTimeout(() => setActive(false), 3000)
+    }
+  }, [trigger])
+
+  if (!active) return null
+
+  return (
+    <div className="banquet-overlay">
+      <div className="banquet-trumpet">🎺</div>
+      <div className="banquet-trumpet banquet-trumpet-2">🎺</div>
+      <div className="banquet-text">Que le banquet commence !</div>
+    </div>
+  )
+}
+
+// === Player Joust ===
+function PlayerJoust({ leaderboard }) {
+  if (leaderboard.length < 2) return null
+
+  const [p1, p2] = leaderboard
+  const duels = [
+    { icon: '⚔️', label: 'Duel de l\'aube' },
+    { icon: '🏹', label: 'Joute des archers' },
+    { icon: '🔮', label: 'Sortilege des mages' },
+  ]
+  const duel = duels[Math.floor(Math.random() * duels.length)]
+
+  return (
+    <div className="joust-card">
+      <h3>{duel.icon} {duel.label}</h3>
+      <div className="joust-arena">
+        <div className="joust-player">
+          <span className="joust-avatar">{p1.avatar || '🛡️'}</span>
+          <span className="joust-name">{p1.name}</span>
+          <span className="joust-score">{p1.score} pts</span>
+        </div>
+        <span className="joust-vs">VS</span>
+        <div className="joust-player">
+          <span className="joust-avatar">{p2.avatar || '🛡️'}</span>
+          <span className="joust-name">{p2.name}</span>
+          <span className="joust-score">{p2.score} pts</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// === Kingdom Weather ===
+function getKingdomWeather(rounds) {
+  const closed = rounds.filter((r) => r.type === 'time' && r.actualValue !== null)
+  if (closed.length === 0) return { icon: '☀️', label: 'Ciel degage', class: 'weather-sunny' }
+
+  const latest = closed.reduce((a, b) => (a.actualValue > b.actualValue ? a : b))
+  const hour = Math.floor(latest.actualValue / 60)
+
+  if (hour >= 11) return { icon: '⛈️', label: 'Tempete de retard', class: 'weather-storm' }
+  if (hour >= 10) return { icon: '🌧️', label: 'Pluie d\'impatience', class: 'weather-rain' }
+  if (hour >= 9) return { icon: '⛅', label: 'Nuages d\'attente', class: 'weather-cloudy' }
+  return { icon: '☀️', label: 'Soleil matinal', class: 'weather-sunny' }
 }
 
 // === Funny trophies ===
@@ -1301,14 +1633,23 @@ function AchievementChest({ rounds, playerName }) {
 }
 
 // === Kingdom Leaderboard (Classement + Carte du royaume) ===
-function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFame }) {
+function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFame, userName }) {
   const maxScore = Math.max(...leaderboard.map((e) => e.score), 1)
   const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const weather = getKingdomWeather(rounds)
+  const [punchline] = useState(() => getPunchline())
+  const [banquetTrigger, setBanquetTrigger] = useState(false)
 
   return (
-    <div className="kingdom-view">
+    <div className={`kingdom-view ${weather.class}`}>
+      <BanquetAnimation trigger={banquetTrigger} />
       <h2 className="section-title">👑 Royaume des Héros</h2>
       <p className="kingdom-date">{today}</p>
+      <div className="kingdom-weather">
+        <span className="weather-icon">{weather.icon}</span>
+        <span className="weather-label">{weather.label}</span>
+      </div>
+      <p className="kingdom-punchline">{punchline}</p>
 
       {/* Carte du royaume */}
       <div className="kingdom-map">
@@ -1364,10 +1705,16 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
         ))}
       </div>
 
+      {/* Joust + Tournament */}
+      <PlayerJoust leaderboard={leaderboard} />
+      <MonthlyTournament rounds={rounds} />
+
       {/* Actions */}
       <div className="header-actions" style={{ justifyContent: 'center', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
+        <DailyQuests rounds={rounds} userName={userName} />
+        <DelayCalendar rounds={rounds} />
         <AchievementChest rounds={rounds} playerName={userName} />
-        <MonthlyRecap rounds={rounds} />
+        <MonthlyRecap rounds={rounds} onOpenBanquet={() => setBanquetTrigger(true)} />
         <button className="btn btn-secondary hall-of-fame-btn" onClick={onOpenHallOfFame}>
           🏆 Hall of Fame
         </button>

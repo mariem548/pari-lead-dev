@@ -777,9 +777,6 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
         </div>
       )}
 
-      {/* Comments section */}
-      <CommentsSection roundId={round.id} userAvatar={userAvatar} />
-
       {/* Distribution chart */}
       {round.bets.length > 0 && (
         <DistributionChart round={round} />
@@ -828,85 +825,6 @@ function DistributionChart({ round }) {
               🎯 Résultat : {round.type === 'time' ? formatTime(round.actualValue) : round.actualValue}
             </div>
           )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// === Comments Section ===
-function CommentsSection({ roundId, userAvatar }) {
-  const [comments, setComments] = useState([])
-  const [message, setMessage] = useState('')
-  const [showComments, setShowComments] = useState(false)
-  const [name, setName] = useState(() => {
-    try { return sessionStorage.getItem('pari-lead-dev-user') || '' } catch { return '' }
-  })
-
-  useEffect(() => {
-    if (!showComments) return
-    api.fetchComments(roundId).then(setComments).catch(() => {})
-  }, [roundId, showComments])
-
-  async function handleAdd() {
-    if (!message.trim() || !name.trim()) return
-    try {
-      const comment = await api.addComment(roundId, name.trim(), userAvatar, message.trim())
-      if (comment) {
-        setComments((prev) => [...prev, comment])
-        setMessage('')
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  async function handleDelete(commentId) {
-    try {
-      await api.deleteComment(roundId, commentId)
-      setComments((prev) => prev.filter((c) => c.id !== commentId))
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  return (
-    <div className="comments-section">
-      <button className="comments-toggle" onClick={() => setShowComments(!showComments)}>
-        💬 Commentaires {comments.length > 0 && `(${comments.length})`}
-      </button>
-      {showComments && (
-        <div className="comments-list">
-          {comments.map((c) => (
-            <div key={c.id} className="comment-item">
-              <span className="comment-avatar">{c.avatar || '🛡️'}</span>
-              <div className="comment-body">
-                <span className="comment-name">{c.name}</span>
-                <span className="comment-text">{c.message}</span>
-              </div>
-              <button className="btn btn-danger comment-delete" onClick={() => handleDelete(c.id)}>✕</button>
-            </div>
-          ))}
-          {comments.length === 0 && (
-            <p className="comment-empty">Aucun commentaire pour le moment</p>
-          )}
-          <div className="comment-form">
-            <input
-              type="text"
-              placeholder="Votre prénom"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="comment-name-input"
-            />
-            <input
-              type="text"
-              placeholder="Votre message..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            />
-            <button className="btn btn-secondary" onClick={handleAdd}>Envoyer</button>
-          </div>
         </div>
       )}
     </div>

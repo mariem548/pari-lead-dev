@@ -74,3 +74,33 @@ CREATE POLICY "bets_delete" ON bets
 -- ============================================
 ALTER TABLE rounds REPLICA IDENTITY FULL;
 ALTER TABLE bets REPLICA IDENTITY FULL;
+
+-- ============================================
+-- Comments table
+-- ============================================
+CREATE TABLE IF NOT EXISTS comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  round_id UUID NOT NULL REFERENCES rounds(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  avatar TEXT,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_comments_round_id ON comments(round_id);
+
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "comments_select" ON comments
+  FOR SELECT TO anon
+  USING (true);
+
+CREATE POLICY "comments_insert" ON comments
+  FOR INSERT TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "comments_delete" ON comments
+  FOR DELETE TO anon
+  USING (true);
+
+ALTER TABLE comments REPLICA IDENTITY FULL;

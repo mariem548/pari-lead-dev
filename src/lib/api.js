@@ -364,12 +364,68 @@ export const api = {
     return data === true
   },
 
+  async fetchComments(roundId) {
+    if (!isSupabaseConfigured) {
+      const data = loadLocal()
+      const round = data.rounds.find((r) => r.id === roundId)
+      return (round && round.comments) || []
+    }
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('round_id', roundId)
+      .order('created_at', { ascending: true })
+    if (error) throw error
+    return data.map((c) => ({
+      id: c.id,
+      name: c.name,
+      avatar: c.avatar || null,
+      message: c.message,
+      createdAt: new Date(c.created_at).getTime(),
+    }))
+  },
+
+  async addComment(roundId, name, avatar, message) {
+    if (!isSupabaseConfigured) {
+      const data = loadLocal()
+      const round = data.rounds.find((r) => r.id === roundId)
+      if (!round) return null
+      if (!round.comments) round.comments = []
+      const comment = { id: genId(), name, avatar: avatar || null, message, createdAt: Date.now() }
+      round.comments.push(comment)
+      saveLocal(data)
+      return comment
+    }
+    const { data, error } = await supabase
+      .from('comments')
+      .insert({ round_id: roundId, name, avatar: avatar || null, message })
+      .select()
+      .single()
+    if (error) throw error
+    return { id: data.id, name: data.name, avatar: data.avatar, message: data.message, createdAt: new Date(data.created_at).getTime() }
+  },
+
+  async deleteComment(roundId, commentId) {
+    if (!isSupabaseConfigured) {
+      const data = loadLocal()
+      const round = data.rounds.find((r) => r.id === roundId)
+      if (round && round.comments) {
+        round.comments = round.comments.filter((c) => c.id !== commentId)
+        saveLocal(data)
+      }
+      return
+    }
+    const { error } = await supabase.from('comments').delete().eq('id', commentId)
+    if (error) throw error
+  },
+
   subscribe(callback) {
     if (!isSupabaseConfigured) return null
     const channel = supabase
       .channel('rounds-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rounds' }, () => callback())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'bets' }, () => callback())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, () => callback())
       .subscribe()
     return () => {
       supabase.removeChannel(channel)

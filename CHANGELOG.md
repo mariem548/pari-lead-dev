@@ -6,7 +6,13 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-## [1.5.0] - 2026-09-24
+## [1.6.0] - 2026-09-24
+
+### Added
+- Commentaires sur chaque pari : chat léger pour se moquer / encourager
+- Table `comments` dans Supabase avec realtime
+- Système de commentaires avec avatar, nom, message
+- Plier/déplier la section commentaires
 
 ### Added
 - Avatars médiévaux : chaque joueur choisit un avatar (chevalier, archer, mage, roi, etc.)

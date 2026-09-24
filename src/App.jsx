@@ -1194,7 +1194,7 @@ function MonthlyRecap({ rounds }) {
                   <span className="recap-icon">🎯</span>
                   <div className="recap-text">
                     <strong>Prédiction la plus précise</strong>
-                    <p>{recap.bestBet.avatar || ''} <strong>{recap.bestBet.name}</strong> a deviné l&rsquo;heure à <strong>{formatTime(recap.bestBet.value)}</strong> pour « {recap.bestBet.roundName} » — pile à {recap.bestBet.diff === 0 ? "l'heure exacte !" : `${recap.bestBet.diff} min près`}</p>
+                    <p>{recap.bestBet.avatar || ''} <strong>{recap.bestBet.name}</strong> a deviné l'heure à <strong>{formatTime(recap.bestBet.value)}</strong> pour « {recap.bestBet.roundName} » — pile à {recap.bestBet.diff === 0 ? "l'heure exacte !" : `${recap.bestBet.diff} min près`}</p>
                   </div>
                 </div>
               )}
@@ -1309,7 +1309,7 @@ function OnboardingModal({ userName, userAvatar, onSave }) {
 		<div className="modal-overlay onboarding-overlay">
 		<div className="modal onboarding-modal">
 			<h2>🏰 Bienvenue au royaume</h2>
-			<p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer l        <p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer à parier</p>rsquo;aventure</p>
+			<p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer l'aventure</p>
         <div className="onboarding-avatar-grid">
           {AVATARS.map((a) => (
             <button
@@ -1333,7 +1333,7 @@ function OnboardingModal({ userName, userAvatar, onSave }) {
             autoFocus
           />
           <button className="btn btn-primary" onClick={handleSave} disabled={!name.trim()}>
-				⚔️ Commencer l            ⚔️ Commencerrsquo;aventure
+				⚔️ Commencer l'aventure
           </button>
         </div>
       </div>

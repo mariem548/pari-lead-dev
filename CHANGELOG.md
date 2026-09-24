@@ -6,6 +6,16 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [3.5.0] - 2026-09-25
+
+### Added — README et règles obligatoires
+- ReadmeGuideModal : guide royal de l'utilisateur en 7 étapes (obligatoire)
+- GameRulesModal devient obligatoire après le README (pas de fermeture par overlay/croix)
+- Flow : Onboarding → README royal → Règles du jeu → app
+- Passage médiéval « Que nul ne croie que ces armoiries furent dessinées au hasard »
+- Clés versionnées README_KEY / RULES_KEY pour forcer la relecture
+- README.md réécrit avec guide d'utilisation complet
+
 ## [3.4.0] - 2026-09-25
 
 ### Added — 7 fonctionnalités medievales drole

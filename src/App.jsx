@@ -30,6 +30,8 @@ const AVATARS = [
 ]
 
 const AVATAR_KEY = 'pari-lead-dev-avatar'
+const README_KEY = 'pari-lead-dev-readme-seen-v1'
+const RULES_KEY = 'pari-lead-dev-rules-seen-v1'
 
 // === Story popup ===
 const STORY_KEY = 'pari-lead-dev-story-seen'
@@ -160,6 +162,9 @@ export default function App() {
   })
   // Story popup shows AFTER onboarding (mandatory read)
   const [showStory, setShowStory] = useState(false)
+  // Readme guide + mandatory rules
+  const [showReadmeGuide, setShowReadmeGuide] = useState(false)
+  const [showMandatoryRules, setShowMandatoryRules] = useState(false)
   const [avatarEntrance, setAvatarEntrance] = useState(false)
   const [activeTab, setActiveTab] = useState('paris')
   const [profilePlayer, setProfilePlayer] = useState(null)
@@ -218,6 +223,23 @@ export default function App() {
   useEffect(() => {
     loadRounds()
   }, [loadRounds])
+
+  // Check for existing users who need to read README/rules v1
+  useEffect(() => {
+    try {
+      const hasUser = sessionStorage.getItem('pari-lead-dev-user')
+      const hasAvatar = sessionStorage.getItem(AVATAR_KEY)
+      if (hasUser && hasAvatar && !showOnboarding) {
+        const readmeSeen = sessionStorage.getItem(README_KEY)
+        const rulesSeen = sessionStorage.getItem(RULES_KEY)
+        if (!readmeSeen) {
+          setShowReadmeGuide(true)
+        } else if (!rulesSeen) {
+          setShowMandatoryRules(true)
+        }
+      }
+    } catch {}
+  }, [showOnboarding])
 
   // Real-time subscription
   useEffect(() => {
@@ -377,10 +399,15 @@ export default function App() {
             setShowOnboarding(false)
             setActiveTab('paris')
             setAvatarEntrance(true)
-            // Show mandatory story popup after onboarding
-            const storySeen = sessionStorage.getItem(STORY_KEY)
-            if (!storySeen) {
-              setShowStory(true)
+            // Mandatory: README guide then rules
+            const readmeSeen = sessionStorage.getItem(README_KEY)
+            if (!readmeSeen) {
+              setShowReadmeGuide(true)
+            } else {
+              const rulesSeen = sessionStorage.getItem(RULES_KEY)
+              if (!rulesSeen) {
+                setShowMandatoryRules(true)
+              }
             }
           }}
         />
@@ -437,6 +464,31 @@ export default function App() {
 
       {/* Game rules modal */}
       <GameRulesModal open={showRules} onClose={() => setShowRules(false)} />
+
+      {/* Mandatory README guide */}
+      <ReadmeGuideModal
+        open={showReadmeGuide}
+        onNext={() => {
+          try {
+            sessionStorage.setItem(README_KEY, '1')
+          } catch {}
+          setShowReadmeGuide(false)
+          setShowMandatoryRules(true)
+        }}
+      />
+
+      {/* Mandatory rules */}
+      <GameRulesModal
+        open={showMandatoryRules}
+        mandatory={true}
+        onClose={() => {
+          try {
+            sessionStorage.setItem(RULES_KEY, '1')
+            sessionStorage.setItem(STORY_KEY, '1')
+          } catch {}
+          setShowMandatoryRules(false)
+        }}
+      />
 
       {/* Confetti overlay */}
       {confetti && <ConfettiOverlay />}
@@ -2008,14 +2060,70 @@ function ExcuseMarket({ rounds }) {
   )
 }
 
-// === Game Rules Modal (Code du Royaume) ===
-function GameRulesModal({ open, onClose }) {
+// === Readme Guide Modal (mandatory) ===
+function ReadmeGuideModal({ open, onNext }) {
   if (!open) return null
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay">
+      <div className="modal rules-modal readme-guide-modal" onClick={(e) => e.stopPropagation()}>
+        <h2>📖 Le Grand Livre du Royaume</h2>
+        <p className="modal-subtitle">Guide royal de l'utilisateur</p>
+
+        <div className="rules-section">
+          <h3>👋 Bienvenue, noble voyageur</h3>
+          <p>Si tu viens d'arriver dans ce royaume, voici comment utiliser l'application étape par étape.</p>
+        </div>
+
+        <div className="rules-section">
+          <h3>🎯 Le but</h3>
+          <p>Devinez l'heure d'arrivée du Suprême Lead Dev. Celui dont la prédiction est la plus proche de l'heure réelle remporte la victoire et gagne des points de renommée.</p>
+        </div>
+
+        <div className="rules-section">
+          <h3>📝 Comment jouer</h3>
+          <ol className="rules-list">
+            <li><strong>Choisir son identité</strong> : au premier lancement, choisis ton avatar et ton pseudo. Ils te suivront dans toute ton aventure.</li>
+            <li><strong>Lire le README</strong> : ce guide que tu lis maintenant est obligatoire.</li>
+            <li><strong>Lire les règles</strong> : après ce guide, les règles du jeu s'affichent. Lecture obligatoire.</li>
+            <li><strong>Créer un pari</strong> : clique sur « + Nouveau pari » et donne-lui un nom.</li>
+            <li><strong>Parier une heure</strong> : saisis l'heure d'arrivée prévue. Formats : <code>9.30</code>, <code>9:30</code>, <code>9h30</code>, <code>10</code>.</li>
+            <li><strong>Clôturer</strong> : quand le Lead Dev arrive, saisis l'heure réelle. L'app calcule le gagnant.</li>
+            <li><strong>Explorer le Royaume</strong> : carte, météo, joutes, quêtes, coffre, tribunal, pigeon, donjon, marché noir.</li>
+          </ol>
+        </div>
+
+        <div className="rules-section">
+          <h3>⏰ Le retard à partir de 9h35</h3>
+          <p>Le royaume commence à compter le retard du Lead Dev à partir de <strong>9h35</strong>, l'heure officielle de début. Si le Lead Dev arrive à 10h02, son retard est de <strong>27 minutes</strong>. S'il arrive avant 9h35, il est « en avance ».</p>
+        </div>
+
+        <div className="rules-section">
+          <h3>🎨 Que nul ne croie que ces armoiries furent dessinées au hasard</h3>
+          <p>Que nul ne croie que ces armoiries furent dessinées au hasard. Chaque détail de ce royaume, du château GIT sculpté dans l'or jusqu'au plus humble des avatars, est le fruit de maintes délibérations au conseil des anciens.</p>
+          <p>Le logo, ce fier château où s'inscrit « GIT » en lettres d'or, ne fut pas gravé en un jour. Les épées croisées qui le gardent furent forgées dans les flammes de mille débats. Le chevalier qui veille sur le royaume ne fut pas choisi par hasard : son destrier, sa cape, sa lance, tout fut pesé, mesuré, discuté.</p>
+          <p>Les douze avatars — le Chevalier, l'Archer, le Mage, le Roi, le Garde, le Guerrier, l'Assassin, le Scribe, le Seigneur, le Dragonnier, le Pyromancien et la Sorcière — chacun fut examiné, débattu, adopté ou rejeté lors de longues assemblées. Nul ne fut admis sans l'accord du conseil.</p>
+          <p>Les blasons des maisons — Crépuscule, Fort, Dragon et Taverne — furent dessinés à la plume, effacés, redessinés. Les titres de noblesse, du Vilain du village au Souverain du Retard, furent calibrés avec la précision d'un horloger royal.</p>
+          <p>Les punchlines, les excuses du Marché Noir, les messages du Pigeon Voyageur : chaque mot fut soupesé, goûté, recraché parfois, jusqu'à ce que la forme parfaite fût trouvée.</p>
+          <p>Que les sceptiques le sachent : même la couleur du parchemin, même l'épaisseur de la bordure dorée, même le choix entre une épée et une lance pour le gardien du château — tout, absolument tout, est le fruit d'une réflexion profonde, patiente et acharnée.</p>
+        </div>
+
+        <button className="btn btn-primary" style={{ marginTop: 'var(--space-4)', width: '100%', justifyContent: 'center' }} onClick={onNext}>
+          ⚔️ J'ai lu le README royal — voir les règles
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// === Game Rules Modal (Code du Royaume) ===
+function GameRulesModal({ open, onClose, mandatory = false }) {
+  if (!open) return null
+
+  return (
+    <div className="modal-overlay" onClick={mandatory ? undefined : onClose}>
       <div className="modal rules-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✕</button>
+        {!mandatory && <button className="modal-close" onClick={onClose}>✕</button>}
         <h2>📜 Code du Royaume</h2>
         <p className="modal-subtitle">Les lois sacrées du pari royal</p>
 
@@ -2083,7 +2191,7 @@ function GameRulesModal({ open, onClose }) {
         </div>
 
         <button className="btn btn-primary" style={{ marginTop: 'var(--space-4)', width: '100%', justifyContent: 'center' }} onClick={onClose}>
-          ⚔️ J'ai compris, que l'aventure commence !
+          {mandatory ? '⚔️ J\'ai lu les règles — entrer dans le royaume' : '⚔️ Fermer le parchemin'}
         </button>
       </div>
     </div>

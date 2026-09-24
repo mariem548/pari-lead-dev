@@ -1293,6 +1293,187 @@ input::placeholder {
   margin-top: var(--space-2);
 }
 
+/* === Tab Navigation === */
+.tab-nav {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: var(--space-1);
+}
+
+.tab-btn {
+  padding: var(--space-2) var(--space-4);
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-interactive);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-surface-2);
+}
+
+.tab-btn.active {
+  color: var(--color-gold);
+  border-bottom-color: var(--color-gold);
+}
+
+/* === Kingdom Map === */
+.kingdom-view {
+  animation: fadeIn 0.3s ease;
+}
+
+.kingdom-date {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4);
+  font-style: italic;
+}
+
+.kingdom-map {
+  position: relative;
+  background: linear-gradient(135deg, var(--color-surface-2), var(--color-surface));
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 180px;
+}
+
+.kingdom-start {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  z-index: 2;
+}
+
+.kingdom-icon {
+  font-size: 1.8rem;
+  display: block;
+}
+
+.kingdom-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  display: block;
+  margin-top: var(--space-1);
+}
+
+.kingdom-path {
+  position: relative;
+  height: 140px;
+  margin: 0 60px 0 50px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-gold) 0,
+    var(--color-gold) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  background-position: center;
+  background-repeat: repeat-x;
+  background-size: 100% 3px;
+  border-radius: var(--radius-sm);
+}
+
+.kingdom-castle {
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  z-index: 2;
+}
+
+.kingdom-player {
+  position: absolute;
+  cursor: pointer;
+  transition: all var(--transition-interactive);
+  z-index: 3;
+}
+
+.kingdom-player:hover {
+  transform: scale(1.2);
+  z-index: 10;
+}
+
+.kingdom-player-avatar {
+  font-size: 1.5rem;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.kingdom-player.rank-1 .kingdom-player-avatar {
+  font-size: 1.8rem;
+}
+
+.kingdom-crown {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-3px); }
+}
+
+.kingdom-player-tooltip {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 20;
+}
+
+.kingdom-player:hover .kingdom-player-tooltip {
+  opacity: 1;
+}
+
+.kingdom-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .kingdom-list {
+    display: none;
+  }
+}
+
+/* === Onboarding overlay (mandatory) === */
+.onboarding-overlay {
+  cursor: default;
+}
+
 /* === Onboarding === */
 .onboarding-modal {
   max-width: 520px;

@@ -157,6 +157,7 @@ export default function App() {
   })
   // Story popup shows AFTER onboarding (mandatory read)
   const [showStory, setShowStory] = useState(false)
+  const [activeTab, setActiveTab] = useState('paris')
   const [profilePlayer, setProfilePlayer] = useState(null)
   const [showHallOfFame, setShowHallOfFame] = useState(false)
   const [confetti, setConfetti] = useState(false)
@@ -355,7 +356,7 @@ export default function App() {
       {/* Knight rider animation */}
       <KnightRider />
 
-      {/* Onboarding modal */}
+      {/* Onboarding modal - mandatory, no skip */}
       {showOnboarding && (
         <OnboardingModal
           userName={userName}
@@ -368,13 +369,13 @@ export default function App() {
               sessionStorage.setItem(AVATAR_KEY, avatar)
             } catch {}
             setShowOnboarding(false)
+            setActiveTab('paris')
             // Show mandatory story popup after onboarding
             const storySeen = sessionStorage.getItem(STORY_KEY)
             if (!storySeen) {
               setShowStory(true)
             }
           }}
-          onClose={() => setShowOnboarding(false)}
         />
       )}
 
@@ -443,6 +444,24 @@ export default function App() {
         </div>
       )}
 
+      {/* Tab navigation */}
+      <nav className="tab-nav">
+        <button
+          className={`tab-btn ${activeTab === 'paris' ? 'active' : ''}`}
+          onClick={() => setActiveTab('paris')}
+        >
+          ⚔️ Salle des paris
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'classement' ? 'active' : ''}`}
+          onClick={() => setActiveTab('classement')}
+        >
+          👑 Royaume
+        </button>
+      </nav>
+
+      {activeTab === 'paris' && (
+      <>
       {/* New round form */}
       <NewRoundForm onCreate={createRound} />
 
@@ -547,6 +566,17 @@ export default function App() {
             Tout effacer
           </button>
         </div>
+      )}
+      </>
+      )}
+
+      {/* Classement tab - Kingdom Map */}
+      {activeTab === 'classement' && (
+        <KingdomLeaderboard
+          leaderboard={leaderboard}
+          onPlayerClick={setProfilePlayer}
+          rounds={rounds}
+        />
       )}
     </div>
   )
@@ -1191,8 +1221,82 @@ function MonthlyRecap({ rounds }) {
   )
 }
 
-// === Onboarding Modal ===
-function OnboardingModal({ userName, userAvatar, onSave, onClose }) {
+// === Kingdom Leaderboard (Classement + Carte du royaume) ===
+function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds }) {
+  const maxScore = Math.max(...leaderboard.map((e) => e.score), 1)
+  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+
+  return (
+    <div className="kingdom-view">
+      <h2 className="section-title">👑 Royaume des Héros</h2>
+      <p className="kingdom-date">{today}</p>
+
+      {/* Carte du royaume */}
+      <div className="kingdom-map">
+        {/* Village (start) */}
+        <div className="kingdom-start">
+          <span className="kingdom-icon">🏘️</span>
+          <span className="kingdom-label">Village</span>
+        </div>
+
+        {/* Path with players */}
+        <div className="kingdom-path">
+          {/* Castle at the end */}
+          <div className="kingdom-castle">
+            <span className="kingdom-icon">🏰</span>
+            <span className="kingdom-label">Château GIT</span>
+          </div>
+          {leaderboard.map((entry, i) => {
+            const progress = Math.round((entry.score / maxScore) * 100)
+            const rank = i + 1
+            const isLeader = rank === 1
+            return (
+              <div
+                key={entry.name}
+                className={`kingdom-player rank-${rank}`}
+                style={{ left: `${Math.max(5, Math.min(progress - 3, 88))}%`, top: `${(i % 3) * 35 + 10}px` }}
+                onClick={() => onPlayerClick(entry)}
+                title={`${entry.name} — ${entry.score} pt${entry.score > 1 ? 's' : ''}`}
+              >
+                <span className="kingdom-player-avatar">{entry.avatar || '🛡️'}</span>
+                {isLeader && <span className="kingdom-crown">👑</span>}
+                <span className="kingdom-player-tooltip">
+                  {entry.name} — {entry.score} pt{entry.score > 1 ? 's' : ''}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Mobile list fallback */}
+      <div className="kingdom-list">
+        {leaderboard.map((entry, i) => (
+          <div key={entry.name} className={`leaderboard-item rank-${i + 1}`}>
+            <div className="leaderboard-rank">{i + 1}</div>
+            <span className="leaderboard-avatar">{entry.avatar || '🛡️'}</span>
+            <button className="leaderboard-name clickable" onClick={() => onPlayerClick(entry)}>{entry.name}</button>
+            {entry.currentStreak >= 2 && (
+              <span className="streak-badge">🔥 {entry.currentStreak}</span>
+            )}
+            <div className="leaderboard-score">{entry.score} pt{entry.score > 1 ? 's' : ''}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Actions */}
+      <div className="header-actions" style={{ justifyContent: 'center', marginTop: 'var(--space-4)' }}>
+        <MonthlyRecap rounds={rounds} />
+        <button className="btn btn-secondary hall-of-fame-btn" onClick={() => {}}>
+          🏆 Hall of Fame
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// === Onboarding Modal (mandatory, no skip) ===
+function OnboardingModal({ userName, userAvatar, onSave }) {
   const [name, setName] = useState(userName || '')
   const [avatar, setAvatar] = useState(userAvatar || AVATARS[0].emoji)
 
@@ -1202,10 +1306,10 @@ function OnboardingModal({ userName, userAvatar, onSave, onClose }) {
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal onboarding-modal" onClick={(e) => e.stopPropagation()}>
-        <h2>🏰 Bienvenue au royaume</h2>
-        <p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer à parier</p>
+		<div className="modal-overlay onboarding-overlay">
+		<div className="modal onboarding-modal">
+			<h2>🏰 Bienvenue au royaume</h2>
+			<p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer l        <p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer à parier</p>rsquo;aventure</p>
         <div className="onboarding-avatar-grid">
           {AVATARS.map((a) => (
             <button
@@ -1229,7 +1333,7 @@ function OnboardingModal({ userName, userAvatar, onSave, onClose }) {
             autoFocus
           />
           <button className="btn btn-primary" onClick={handleSave} disabled={!name.trim()}>
-            ⚔️ Commencer
+				⚔️ Commencer l            ⚔️ Commencerrsquo;aventure
           </button>
         </div>
       </div>

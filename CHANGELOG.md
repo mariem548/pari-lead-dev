@@ -6,6 +6,32 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [2.5.0] - 2026-09-25
+
+### Added
+- Onglet "Royaume" : carte visuelle des joueurs avançant vers le château GIT
+- Survol d'un joueur : affiche prénom + points
+- Leaderboard fusionné avec la carte du royaume (médieval)
+- Onglets de navigation : ⚔️ Salle des paris / 👑 Royaume
+- Onboarding obligatoire : choix avatar+nom puis lecture popup histoire
+- Bouton "Changer de profil" dans le header
+
+### Changed
+- Onboarding non contournable (pas de fermeture sans choix)
+- Landing directe sur l'onglet "paris" après onboarding
+
+## [2.4.0] - 2026-09-25
+
+### Added
+- Logo redessiné : château médiéval avec tours, toits coniques rouges, texte GIT sur la muraille
+- Chevalier à cheval avec couronne, cape et lance dans le logo
+- Flux obligatoire : choix avatar+nom puis lecture de la popup d'histoire
+- Bouton "Changer de profil" dans le header avec avatar et nom affichés
+
+### Changed
+- Palette du logo : moutarde, rouge, anthracite, or
+- Favicon mis à jour pour correspondre au nouveau logo
+
 ## [2.3.0] - 2026-09-25
 
 ### Added

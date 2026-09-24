@@ -353,9 +353,6 @@ export default function App() {
   // --- Render ---
   return (
     <div className="app">
-      {/* Knight rider animation */}
-      <KnightRider />
-
       {/* Onboarding modal - mandatory, no skip */}
       {showOnboarding && (
         <OnboardingModal
@@ -1001,34 +998,6 @@ function HallOfFameModal({ rounds, onClose }) {
 // === Confetti Overlay ===
 const CONFETTI_EMOJIS = ['⚔️', '🏹', '🛡️', '👑', '🏰', '🔥', '🏆', '⚔️', '🗡️', '🛡️']
 
-// === Knight Rider Animation ===
-function KnightRider() {
-  const [riding, setRiding] = useState(false)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRiding(true)
-      setTimeout(() => setRiding(false), 4000)
-    }, 20000)
-    return () => clearInterval(interval)
-  }, [])
-
-  if (!riding) return null
-
-  return (
-    <div className="knight-rider">
-      <div className="knight-horse">
-        <div className="knight-body">🐎</div>
-        <div className="knight-rider-figure">⚔️</div>
-        <div className="knight-cape"></div>
-      </div>
-      <div className="knight-dust">
-        <span>💨</span><span>💨</span><span>💨</span>
-      </div>
-    </div>
-  )
-}
-
 // === Sound effects (Web Audio API) ===
 let audioCtx = null
 function getAudioCtx() {
@@ -1260,6 +1229,77 @@ function getMedievalTitle(score) {
   return result
 }
 
+// === Funny trophies ===
+const TROPHIES = [
+  { id: 'pile', icon: '🎯', name: 'Pile à l\'heure', desc: 'Prédiction exacte (0 min d\'écart)' },
+  { id: 'proche', icon: '🏹', name: 'Presque devin', desc: 'Prédiction à 5 min ou moins' },
+  { id: 'optimiste', icon: '🌅', name: 'Trop optimiste', desc: 'Toujours en avance sur le lead dev' },
+  { id: 'cafe', icon: '☕', name: 'Prophète du café', desc: 'Au moins 3 paris avant 10h' },
+  { id: 'stagiaire', icon: '📝', name: 'Stagiaire du Royaume', desc: 'Premier pari joué' },
+  { id: 'habitue', icon: '⚔️', name: 'Habitué de la taverne', desc: 'Au moins 5 paris joués' },
+  { id: 'champion', icon: '👑', name: 'Champion du mois', desc: 'Meilleur prédicteur du mois' },
+  { id: 'meme', icon: '🔄', name: 'L\'Éternel', desc: 'Au moins 10 paris joués' },
+]
+
+function computeTrophies(rounds, playerName) {
+  const unlocked = new Set()
+  const playerBets = []
+  rounds.forEach((r) => {
+    r.bets.forEach((bet) => {
+      if (bet.name === playerName) {
+        playerBets.push({ ...bet, actualValue: r.actualValue, roundName: r.name })
+        if (r.actualValue !== null) {
+          const diff = Math.abs(bet.value - r.actualValue)
+          if (diff === 0) unlocked.add('pile')
+          if (diff <= 5) unlocked.add('proche')
+          if (bet.value < r.actualValue) unlocked.add('optimiste')
+          const h = Math.floor(bet.value / 60)
+          if (h < 10) unlocked.add('cafe')
+        }
+      }
+    })
+  })
+  if (playerBets.length >= 1) unlocked.add('stagiaire')
+  if (playerBets.length >= 5) unlocked.add('habitue')
+  if (playerBets.length >= 10) unlocked.add('meme')
+  return TROPHIES.map((t) => ({ ...t, unlocked: unlocked.has(t.id) }))
+}
+
+// === Achievement Chest ===
+function AchievementChest({ rounds, playerName }) {
+  const [show, setShow] = useState(false)
+  const trophies = useMemo(() => computeTrophies(rounds, playerName), [rounds, playerName])
+  const unlockedCount = trophies.filter((t) => t.unlocked).length
+
+  if (!playerName) return null
+
+  return (
+    <>
+      <button className="btn btn-secondary" onClick={() => setShow(true)}>
+        🎁 Coffre aux exploits ({unlockedCount}/{trophies.length})
+      </button>
+      {show && (
+        <div className="modal-overlay" onClick={() => setShow(false)}>
+          <div className="modal achievement-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShow(false)}>✕</button>
+            <h2>🎁 Coffre aux Exploits</h2>
+            <p className="modal-subtitle">Trophées de {playerName}</p>
+            <div className="trophies-grid">
+              {trophies.map((t) => (
+                <div key={t.id} className={`trophy-card ${t.unlocked ? 'unlocked' : 'locked'}`}>
+                  <span className="trophy-icon">{t.unlocked ? t.icon : '🔒'}</span>
+                  <span className="trophy-name">{t.name}</span>
+                  <span className="trophy-desc">{t.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 // === Kingdom Leaderboard (Classement + Carte du royaume) ===
 function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFame }) {
   const maxScore = Math.max(...leaderboard.map((e) => e.score), 1)
@@ -1325,7 +1365,8 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
       </div>
 
       {/* Actions */}
-      <div className="header-actions" style={{ justifyContent: 'center', marginTop: 'var(--space-4)' }}>
+      <div className="header-actions" style={{ justifyContent: 'center', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
+        <AchievementChest rounds={rounds} playerName={userName} />
         <MonthlyRecap rounds={rounds} />
         <button className="btn btn-secondary hall-of-fame-btn" onClick={onOpenHallOfFame}>
           🏆 Hall of Fame

@@ -705,6 +705,57 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
 
       {/* Comments section */}
       <CommentsSection roundId={round.id} userAvatar={userAvatar} />
+
+      {/* Distribution chart */}
+      {round.bets.length > 0 && (
+        <DistributionChart round={round} />
+      )}
+    </div>
+  )
+}
+
+// === Distribution Chart ===
+function DistributionChart({ round }) {
+  const [show, setShow] = useState(false)
+
+  const bets = [...round.bets].sort((a, b) => a.value - b.value)
+  const values = bets.map((b) => b.value)
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const range = max - min || 1
+
+  return (
+    <div className="dist-chart-section">
+      <button className="comments-toggle" onClick={() => setShow(!show)}>
+        📊 Distribution {show ? '▲' : '▼'}
+      </button>
+      {show && (
+        <div className="dist-chart">
+          {bets.map((bet) => {
+            const pct = ((bet.value - min) / range) * 80 + 10
+            const isWinner = round.winners && round.winners.includes(bet.id)
+            return (
+              <div key={bet.id} className="dist-bar-row">
+                <span className="dist-bar-label">{bet.avatar || '🛡️'} {bet.name}</span>
+                <div className="dist-bar-track">
+                  <div
+                    className={`dist-bar-fill ${isWinner ? 'winner' : ''}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                  <span className="dist-bar-value">
+                    {round.type === 'time' ? formatTime(bet.value) : bet.value}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+          {round.actualValue !== null && round.actualValue !== undefined && (
+            <div className="dist-actual">
+              🎯 Résultat : {round.type === 'time' ? formatTime(round.actualValue) : round.actualValue}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

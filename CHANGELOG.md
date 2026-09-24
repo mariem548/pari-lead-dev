@@ -6,7 +6,12 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-## [1.6.0] - 2026-09-24
+## [1.7.0] - 2026-09-24
+
+### Added
+- Graphique de distribution des paris : visualise où tout le monde a parié avec des barres
+- Les barres dorées indiquent les gagnants
+- Affichage du résultat réel (cible 🎯)
 
 ### Added
 - Commentaires sur chaque pari : chat léger pour se moquer / encourager

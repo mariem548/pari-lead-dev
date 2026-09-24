@@ -1241,6 +1241,25 @@ function MonthlyRecap({ rounds }) {
   )
 }
 
+// === Medieval titles ===
+const MEDIEVAL_TITLES = [
+  { min: 0, title: 'Vilain du village', icon: '🧑‍🌾' },
+  { min: 1, title: 'Écuyer', icon: '🛡️' },
+  { min: 3, title: 'Chevalier', icon: '⚔️' },
+  { min: 6, title: 'Baron', icon: '🏰' },
+  { min: 10, title: 'Comte', icon: '👑' },
+  { min: 15, title: 'Grand Oracle', icon: '🔮' },
+  { min: 25, title: 'Souverain du Retard', icon: '👑' },
+]
+
+function getMedievalTitle(score) {
+  let result = MEDIEVAL_TITLES[0]
+  for (const t of MEDIEVAL_TITLES) {
+    if (score >= t.min) result = t
+  }
+  return result
+}
+
 // === Kingdom Leaderboard (Classement + Carte du royaume) ===
 function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFame }) {
   const maxScore = Math.max(...leaderboard.map((e) => e.score), 1)
@@ -1276,7 +1295,7 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
                 className={`kingdom-player rank-${rank}`}
                 style={{ left: `${Math.max(5, Math.min(progress - 3, 88))}%`, top: `${(i % 3) * 35 + 10}px` }}
                 onClick={() => onPlayerClick(entry)}
-                title={`${entry.name} — ${entry.score} pt${entry.score > 1 ? 's' : ''}`}
+                title={`${entry.name} — ${entry.score} pt${entry.score > 1 ? 's' : ''} — ${getMedievalTitle(entry.score).title}`}
               >
                 <span className="kingdom-player-avatar">{entry.avatar || '🛡️'}</span>
                 {isLeader && <span className="kingdom-crown">👑</span>}
@@ -1300,6 +1319,7 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
               <span className="streak-badge">🔥 {entry.currentStreak}</span>
             )}
             <div className="leaderboard-score">{entry.score} pt{entry.score > 1 ? 's' : ''}</div>
+            <div className="leaderboard-title">{getMedievalTitle(entry.score).icon} {getMedievalTitle(entry.score).title}</div>
           </div>
         ))}
       </div>

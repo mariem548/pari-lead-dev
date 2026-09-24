@@ -1809,6 +1809,38 @@ input::placeholder {
   color: var(--color-text-muted);
 }
 
+/* === Round Tribunal verdict === */
+.round-tribunal {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 2px solid rgba(180, 80, 80, 0.3);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-surface), rgba(180, 80, 80, 0.05));
+}
+
+.round-tribunal-header {
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-1);
+}
+
+.round-tribunal-verdict {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: #c8443a;
+  font-family: var(--font-display);
+  text-transform: capitalize;
+  margin-bottom: var(--space-1);
+}
+
+.round-tribunal-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
 /* === Fun Cards Grid === */
 .kingdom-fun-grid {
   display: grid;

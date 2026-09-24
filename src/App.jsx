@@ -883,6 +883,20 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
           {round.actualValue !== null && round.actualValue !== undefined && (
             <div className="result-delay">{formatDelay(round.actualValue)}</div>
           )}
+          {/* Tribunal Royal verdict on closed round */}
+          {!isOpen && round.actualValue !== null && round.actualValue !== undefined && (() => {
+            const delay = computeDelayMinutes(round.actualValue)
+            if (delay === null) return null
+            const verdict = TRIBUNAL_VERDICTS.find((v) => delay <= v.max) || TRIBUNAL_VERDICTS[TRIBUNAL_VERDICTS.length - 1]
+            const verdictText = verdict.text.replace('{delay}', delay)
+            return (
+              <div className="round-tribunal">
+                <div className="round-tribunal-header">{verdict.icon} Tribunal Royal du Retard</div>
+                <div className="round-tribunal-verdict">{verdict.verdict}</div>
+                <div className="round-tribunal-text">{verdictText}</div>
+              </div>
+            )
+          })()}
           {winners.length > 0 && (
             <div className="result-winner">
               {winners.length === 1 ? (

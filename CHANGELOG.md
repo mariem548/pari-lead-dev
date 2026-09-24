@@ -9,7 +9,26 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 ## [Unreleased]
 
 ### Added
-- Configuration Supabase pour le mode partagé (en attente des credentials)
+- Configuration Supabase pour le mode partagé
+
+### Fixed
+- Les nouveaux paris ne s'affichaient pas en mode partagé (Supabase) — mise à jour de l'état local systématique après chaque action
+
+---
+
+## [1.4.0] - 2026-09-24
+
+### Added
+- Thème médiéval : parchemin, or, bordures décoratives, police Cinzel + MedievalSharp
+- Icônes médiévales (🛡️ bouclier, ⚔ épées, 🏹 arc) dans le header et les titres
+- Badges de classement style médailles (or, argent, bronze) avec dégradés et bordures
+- Texture parchemin sur les cards et la pop-up
+- Logo bouclier doré avec dégradé
+- Bouton primaire avec dégradé et bordure
+
+### Fixed
+- Les nouveaux paris n'apparaissaient pas en mode partagé (Supabase) — l'état local n'était mis à jour qu'en mode localStorage
+- Toutes les actions (createRound, addBet, closeRound, etc.) mettent maintenant à jour l'UI immédiatement, même en mode Supabase
 
 ---
 

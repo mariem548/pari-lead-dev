@@ -129,11 +129,8 @@ export default function App() {
   async function createRound(name, type) {
     try {
       const round = await api.createRound(name, type)
-      if (isSupabaseConfigured) {
-        // Real-time will handle it
-      } else {
-        setRounds((prev) => [...prev, round])
-      }
+      // Always update local state immediately
+      setRounds((prev) => [round, ...prev])
     } catch (e) {
       setError('Erreur: ' + e.message)
     }
@@ -142,12 +139,15 @@ export default function App() {
   async function addBet(roundId, name, valueStr, type) {
     try {
       const bet = await api.addBet(roundId, name, valueStr, type)
-      if (!isSupabaseConfigured && bet) {
+      if (bet) {
         setRounds((prev) =>
           prev.map((r) =>
             r.id === roundId ? { ...r, bets: [...r.bets, bet] } : r,
           ),
         )
+      } else {
+        // Supabase: reload to get the bet with correct ID
+        loadRounds()
       }
     } catch (e) {
       setError('Erreur: ' + e.message)
@@ -157,13 +157,11 @@ export default function App() {
   async function removeBet(roundId, betId) {
     try {
       await api.removeBet(roundId, betId)
-      if (!isSupabaseConfigured) {
-        setRounds((prev) =>
-          prev.map((r) =>
-            r.id === roundId ? { ...r, bets: r.bets.filter((b) => b.id !== betId) } : r,
-          ),
-        )
-      }
+      setRounds((prev) =>
+        prev.map((r) =>
+          r.id === roundId ? { ...r, bets: r.bets.filter((b) => b.id !== betId) } : r,
+        ),
+      )
     } catch (e) {
       setError('Erreur: ' + e.message)
     }
@@ -172,16 +170,14 @@ export default function App() {
   async function closeRound(roundId, actualInput, type) {
     try {
       await api.closeRound(roundId, actualInput, type)
-      if (!isSupabaseConfigured) {
-        setRounds((prev) =>
-          prev.map((r) => {
-            if (r.id !== roundId) return r
-            const value = type === 'time' ? parseTimeLocal(actualInput) : parseNumberLocal(actualInput)
-            const winners = computeWinners({ ...r, actualValue: value })
-            return { ...r, actualValue: value, actualInput, status: 'closed', winners }
-          }),
-        )
-      }
+      setRounds((prev) =>
+        prev.map((r) => {
+          if (r.id !== roundId) return r
+          const value = type === 'time' ? parseTimeLocal(actualInput) : parseNumberLocal(actualInput)
+          const winners = computeWinners({ ...r, actualValue: value })
+          return { ...r, actualValue: value, actualInput, status: 'closed', winners }
+        }),
+      )
     } catch (e) {
       setError('Erreur: ' + e.message)
     }
@@ -190,15 +186,13 @@ export default function App() {
   async function reopenRound(roundId) {
     try {
       await api.reopenRound(roundId)
-      if (!isSupabaseConfigured) {
-        setRounds((prev) =>
-          prev.map((r) =>
-            r.id === roundId
-              ? { ...r, status: 'open', winners: [], actualValue: null, actualInput: '' }
-              : r,
-          ),
-        )
-      }
+      setRounds((prev) =>
+        prev.map((r) =>
+          r.id === roundId
+            ? { ...r, status: 'open', winners: [], actualValue: null, actualInput: '' }
+            : r,
+        ),
+      )
     } catch (e) {
       setError('Erreur: ' + e.message)
     }
@@ -208,9 +202,7 @@ export default function App() {
     if (!confirm('Supprimer ce pari ? Les scores seront recalculés.')) return
     try {
       await api.deleteRound(roundId)
-      if (!isSupabaseConfigured) {
-        setRounds((prev) => prev.filter((r) => r.id !== roundId))
-      }
+      setRounds((prev) => prev.filter((r) => r.id !== roundId))
     } catch (e) {
       setError('Erreur: ' + e.message)
     }
@@ -220,9 +212,7 @@ export default function App() {
     if (!confirm('Tout effacer ? Tous les paris et scores seront perdus.')) return
     try {
       await api.resetAll()
-      if (!isSupabaseConfigured) {
-        setRounds([])
-      }
+      setRounds([])
     } catch (e) {
       setError('Erreur: ' + e.message)
     }
@@ -234,7 +224,7 @@ export default function App() {
       <div className="app">
         <header className="header">
           <div className="header-left">
-            <div className="logo">🎯</div>
+            <div className="logo">🛡️</div>
             <div>
               <h1>Pari Lead Dev</h1>
               <p>Paris d'équipe</p>
@@ -242,7 +232,7 @@ export default function App() {
           </div>
         </header>
         <div className="empty-state">
-          <div className="empty-state-icon">⏳</div>
+          <div className="empty-state-icon">🏰</div>
           <h3>Chargement...</h3>
         </div>
       </div>
@@ -317,7 +307,7 @@ export default function App() {
       {/* Rounds */}
       {rounds.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">🎯</div>
+          <div className="empty-state-icon">🏰</div>
           <h3>Aucun pari pour le moment</h3>
           <p>Créez un premier pari ci-dessus pour commencer à jouer !</p>
         </div>

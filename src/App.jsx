@@ -1,130 +1,13 @@
-import { useState, useEffect, useMemo } from 'react'
-
-// === Storage (localStorage with fallback) ===
-const STORAGE_KEY = 'pari-lead-dev-data'
-
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : { rounds: [] }
-  } catch {
-    return { rounds: [] }
-  }
-}
-
-function saveData(data) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  } catch {
-    // localStorage blocked (iframe) — data lives in memory only
-  }
-}
-
-// === Time parsing ===
-// "9.3" → 9h30, "9.30" → 9h30, "9:30" → 9h30, "9h30" → 9h30, "10" → 10h00
-function parseTime(input) {
-  if (!input || typeof input !== 'string') return null
-  const cleaned = input.replace(/[hH:]/g, '.').trim()
-  const parts = cleaned.split('.')
-  const hours = parseInt(parts[0], 10)
-  let minutes = 0
-  if (parts.length > 1 && parts[1]) {
-    let minStr = parts[1]
-    if (minStr.length === 1) minStr = minStr + '0'
-    minutes = parseInt(minStr, 10)
-  }
-  if (isNaN(hours) || hours < 0 || hours > 23) return null
-  if (isNaN(minutes) || minutes < 0 || minutes > 59) return null
-  return hours * 60 + minutes
-}
-
-function formatTime(minutes) {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  return `${h}h${String(m).padStart(2, '0')}`
-}
-
-function formatTimeInput(minutes) {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  return `${h}.${String(m).padStart(2, '0')}`
-}
-
-// === Number parsing ===
-function parseNumber(input) {
-  if (!input || typeof input !== 'string') return null
-  const n = parseFloat(input.replace(',', '.'))
-  return isNaN(n) ? null : n
-}
-
-// === ID generator ===
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
-}
-
-// === Date helpers ===
-function formatDate(ts) {
-  if (!ts) return ''
-  const d = new Date(ts)
-  const days = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam']
-  const months = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc']
-  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`
-}
-
-function isThisWeek(ts) {
-  if (!ts) return false
-  const now = new Date()
-  const day = now.getDay()
-  const monday = new Date(now)
-  const diff = day === 0 ? -6 : 1 - day
-  monday.setDate(now.getDate() + diff)
-  monday.setHours(0, 0, 0, 0)
-  return new Date(ts) >= monday
-}
-
-function isThisMonth(ts) {
-  if (!ts) return false
-  const now = new Date()
-  const d = new Date(ts)
-  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
-}
-
-function filterRoundsByPeriod(rounds, period) {
-  if (period === 'all') return rounds
-  return rounds.filter((r) => {
-    if (period === 'week') return isThisWeek(r.createdAt)
-    if (period === 'month') return isThisMonth(r.createdAt)
-    return true
-  })
-}
-
-// === Winner calculation ===
-function computeWinners(round) {
-  if (!round.actualValue || round.bets.length === 0) return []
-  const actual = round.actualValue
-  const diffs = round.bets.map((bet) => ({
-    bet,
-    diff: Math.abs(bet.value - actual),
-  }))
-  const minDiff = Math.min(...diffs.map((d) => d.diff))
-  return diffs.filter((d) => d.diff === minDiff).map((d) => d.bet.id)
-}
-
-// === Leaderboard ===
-function computeLeaderboard(rounds) {
-  const scores = {}
-  rounds.forEach((round) => {
-    if (round.status !== 'closed' || !round.winners) return
-    round.bets.forEach((bet) => {
-      if (!scores[bet.name]) scores[bet.name] = { name: bet.name, score: 0, wins: 0 }
-      if (round.winners.includes(bet.id)) {
-        scores[bet.name].score += round.pointsPerWin || 1
-        scores[bet.name].wins += 1
-      }
-    })
-  })
-  return Object.values(scores).sort((a, b) => b.score - a.score || b.wins - a.wins)
-}
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { supabase, isSupabaseConfigured } from './lib/supabase'
+import {
+  api,
+  computeWinners,
+  computeLeaderboard,
+  formatDate,
+  filterRoundsByPeriod,
+  formatTime,
+} from './lib/api'
 
 // === Theme ===
 function useTheme() {
@@ -163,89 +46,164 @@ function MoonIcon() {
 // === Main App ===
 export default function App() {
   const { theme, toggle } = useTheme()
-  const [data, setData] = useState(loadData)
+  const [rounds, setRounds] = useState([])
   const [period, setPeriod] = useState('all')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  // Load data
+  const loadRounds = useCallback(async () => {
+    try {
+      const data = await api.fetchRounds()
+      setRounds(data)
+      setError('')
+    } catch (e) {
+      setError('Erreur de chargement: ' + e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    saveData(data)
-  }, [data])
+    loadRounds()
+  }, [loadRounds])
 
-  const filteredRounds = useMemo(() => filterRoundsByPeriod(data.rounds, period), [data.rounds, period])
+  // Real-time subscription
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+    const unsubscribe = api.subscribe(() => {
+      loadRounds()
+    })
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
+  }, [loadRounds])
+
+  const filteredRounds = useMemo(() => filterRoundsByPeriod(rounds, period), [rounds, period])
   const leaderboard = useMemo(() => computeLeaderboard(filteredRounds), [filteredRounds])
 
   // --- Actions ---
-  function createRound(name, type) {
-    const round = {
-      id: genId(),
-      name: name.trim() || (type === 'time' ? 'Arrivée du lead dev' : 'Nouveau pari'),
-      type,
-      bets: [],
-      actualValue: null,
-      actualInput: '',
-      status: 'open',
-      winners: [],
-      pointsPerWin: 1,
-      createdAt: Date.now(),
+  async function createRound(name, type) {
+    try {
+      const round = await api.createRound(name, type)
+      if (isSupabaseConfigured) {
+        // Real-time will handle it
+      } else {
+        setRounds((prev) => [...prev, round])
+      }
+    } catch (e) {
+      setError('Erreur: ' + e.message)
     }
-    setData((d) => ({ ...d, rounds: [...d.rounds, round] }))
   }
 
-  function addBet(roundId, name, valueStr) {
-    setData((d) => ({
-      ...d,
-      rounds: d.rounds.map((r) => {
-        if (r.id !== roundId) return r
-        const value = r.type === 'time' ? parseTime(valueStr) : parseNumber(valueStr)
-        if (value === null) return r
-        return {
-          ...r,
-          bets: [...r.bets, { id: genId(), name: name.trim(), value }],
-        }
-      }),
-    }))
+  async function addBet(roundId, name, valueStr, type) {
+    try {
+      const bet = await api.addBet(roundId, name, valueStr, type)
+      if (!isSupabaseConfigured && bet) {
+        setRounds((prev) =>
+          prev.map((r) =>
+            r.id === roundId ? { ...r, bets: [...r.bets, bet] } : r,
+          ),
+        )
+      }
+    } catch (e) {
+      setError('Erreur: ' + e.message)
+    }
   }
 
-  function removeBet(roundId, betId) {
-    setData((d) => ({
-      ...d,
-      rounds: d.rounds.map((r) =>
-        r.id === roundId ? { ...r, bets: r.bets.filter((b) => b.id !== betId) } : r,
-      ),
-    }))
+  async function removeBet(roundId, betId) {
+    try {
+      await api.removeBet(roundId, betId)
+      if (!isSupabaseConfigured) {
+        setRounds((prev) =>
+          prev.map((r) =>
+            r.id === roundId ? { ...r, bets: r.bets.filter((b) => b.id !== betId) } : r,
+          ),
+        )
+      }
+    } catch (e) {
+      setError('Erreur: ' + e.message)
+    }
   }
 
-  function closeRound(roundId, actualInput) {
-    setData((d) => ({
-      ...d,
-      rounds: d.rounds.map((r) => {
-        if (r.id !== roundId) return r
-        const actualValue = r.type === 'time' ? parseTime(actualInput) : parseNumber(actualInput)
-        if (actualValue === null) return r
-        const winners = computeWinners({ ...r, actualValue })
-        return { ...r, actualValue, actualInput, status: 'closed', winners }
-      }),
-    }))
+  async function closeRound(roundId, actualInput, type) {
+    try {
+      await api.closeRound(roundId, actualInput, type)
+      if (!isSupabaseConfigured) {
+        setRounds((prev) =>
+          prev.map((r) => {
+            if (r.id !== roundId) return r
+            const value = type === 'time' ? parseTimeLocal(actualInput) : parseNumberLocal(actualInput)
+            const winners = computeWinners({ ...r, actualValue: value })
+            return { ...r, actualValue: value, actualInput, status: 'closed', winners }
+          }),
+        )
+      }
+    } catch (e) {
+      setError('Erreur: ' + e.message)
+    }
   }
 
-  function reopenRound(roundId) {
-    setData((d) => ({
-      ...d,
-      rounds: d.rounds.map((r) =>
-        r.id === roundId
-          ? { ...r, status: 'open', winners: [], actualValue: null, actualInput: '' }
-          : r,
-      ),
-    }))
+  async function reopenRound(roundId) {
+    try {
+      await api.reopenRound(roundId)
+      if (!isSupabaseConfigured) {
+        setRounds((prev) =>
+          prev.map((r) =>
+            r.id === roundId
+              ? { ...r, status: 'open', winners: [], actualValue: null, actualInput: '' }
+              : r,
+          ),
+        )
+      }
+    } catch (e) {
+      setError('Erreur: ' + e.message)
+    }
   }
 
-  function deleteRound(roundId) {
+  async function deleteRound(roundId) {
     if (!confirm('Supprimer ce pari ? Les scores seront recalculés.')) return
-    setData((d) => ({ ...d, rounds: d.rounds.filter((r) => r.id !== roundId) }))
+    try {
+      await api.deleteRound(roundId)
+      if (!isSupabaseConfigured) {
+        setRounds((prev) => prev.filter((r) => r.id !== roundId))
+      }
+    } catch (e) {
+      setError('Erreur: ' + e.message)
+    }
   }
 
-  function resetAll() {
+  async function resetAll() {
     if (!confirm('Tout effacer ? Tous les paris et scores seront perdus.')) return
-    setData({ rounds: [] })
+    try {
+      await api.resetAll()
+      if (!isSupabaseConfigured) {
+        setRounds([])
+      }
+    } catch (e) {
+      setError('Erreur: ' + e.message)
+    }
+  }
+
+  // --- Loading state ---
+  if (loading) {
+    return (
+      <div className="app">
+        <header className="header">
+          <div className="header-left">
+            <div className="logo">🎯</div>
+            <div>
+              <h1>Pari Lead Dev</h1>
+              <p>Paris d'équipe</p>
+            </div>
+          </div>
+        </header>
+        <div className="empty-state">
+          <div className="empty-state-icon">⏳</div>
+          <h3>Chargement...</h3>
+        </div>
+      </div>
+    )
   }
 
   // --- Render ---
@@ -257,7 +215,7 @@ export default function App() {
           <div className="logo">🎯</div>
           <div>
             <h1>Pari Lead Dev</h1>
-            <p>Paris d'équipe</p>
+            <p>Paris d'équipe {isSupabaseConfigured ? '— partagé' : ''}</p>
           </div>
         </div>
         <button className="theme-toggle" onClick={toggle} aria-label="Changer de thème">
@@ -265,11 +223,26 @@ export default function App() {
         </button>
       </header>
 
+      {/* Setup banner */}
+      {!isSupabaseConfigured && (
+        <div className="setup-banner">
+          <strong>Mode local</strong> — vos données sont sur votre navigateur uniquement.
+          Pour partager avec toute l'équipe, configurez Supabase (voir le README).
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="error-banner" onClick={() => setError('')}>
+          {error} ✕
+        </div>
+      )}
+
       {/* New round form */}
       <NewRoundForm onCreate={createRound} />
 
       {/* Period filter */}
-      {data.rounds.length > 0 && (
+      {rounds.length > 0 && (
         <div className="period-filter">
           <button
             className={`period-btn ${period === 'week' ? 'active' : ''}`}
@@ -293,7 +266,7 @@ export default function App() {
       )}
 
       {/* Rounds */}
-      {data.rounds.length === 0 ? (
+      {rounds.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">🎯</div>
           <h3>Aucun pari pour le moment</h3>
@@ -348,7 +321,7 @@ export default function App() {
       )}
 
       {/* Reset */}
-      {data.rounds.length > 0 && (
+      {rounds.length > 0 && (
         <div className="text-center mt-4">
           <button className="btn btn-ghost" onClick={resetAll}>
             Tout effacer
@@ -357,6 +330,29 @@ export default function App() {
       )}
     </div>
   )
+}
+
+// === Local parsing helpers (for localStorage mode) ===
+function parseTimeLocal(input) {
+  if (!input || typeof input !== 'string') return null
+  const cleaned = input.replace(/[hH:]/g, '.').trim()
+  const parts = cleaned.split('.')
+  const hours = parseInt(parts[0], 10)
+  let minutes = 0
+  if (parts.length > 1 && parts[1]) {
+    let minStr = parts[1]
+    if (minStr.length === 1) minStr = minStr + '0'
+    minutes = parseInt(minStr, 10)
+  }
+  if (isNaN(hours) || hours < 0 || hours > 23) return null
+  if (isNaN(minutes) || minutes < 0 || minutes > 59) return null
+  return hours * 60 + minutes
+}
+
+function parseNumberLocal(input) {
+  if (!input || typeof input !== 'string') return null
+  const n = parseFloat(input.replace(',', '.'))
+  return isNaN(n) ? null : n
 }
 
 // === New Round Form ===
@@ -389,18 +385,17 @@ function NewRoundForm({ onCreate }) {
             placeholder={type === 'time' ? 'Arrivée du lead dev' : 'Température de demain'}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            data-testid="input-round-name"
           />
         </div>
         <div className="form-group">
           <label>Type</label>
-          <select value={type} onChange={(e) => setType(e.target.value)} data-testid="select-round-type">
+          <select value={type} onChange={(e) => setType(e.target.value)}>
             <option value="time">Heure</option>
             <option value="number">Nombre</option>
           </select>
         </div>
         <div className="flex-gap-2">
-          <button className="btn btn-primary" onClick={handleSubmit} data-testid="button-create-round">
+          <button className="btn btn-primary" onClick={handleSubmit}>
             Créer le pari
           </button>
           <button className="btn btn-secondary" onClick={() => setExpanded(false)}>
@@ -429,26 +424,26 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
 
   function handleAddBet() {
     if (!betName.trim() || !betValue.trim()) return
-    const value = round.type === 'time' ? parseTime(betValue) : parseNumber(betValue)
+    const value = round.type === 'time' ? parseTimeLocal(betValue) : parseNumberLocal(betValue)
     if (value === null) {
       setError(round.type === 'time' ? 'Format invalide. Ex: 9.30, 9:30, 10h00' : 'Nombre invalide')
       return
     }
     setError('')
-    onAddBet(round.id, betName, betValue)
+    onAddBet(round.id, betName, betValue, round.type)
     setBetName('')
     setBetValue('')
   }
 
   function handleClose() {
     if (!actualInput.trim()) return
-    const value = round.type === 'time' ? parseTime(actualInput) : parseNumber(actualInput)
+    const value = round.type === 'time' ? parseTimeLocal(actualInput) : parseNumberLocal(actualInput)
     if (value === null) {
       setError(round.type === 'time' ? 'Format invalide' : 'Nombre invalide')
       return
     }
     setError('')
-    onClose(round.id, actualInput)
+    onClose(round.id, actualInput, round.type)
   }
 
   // Sort bets by value for display
@@ -460,7 +455,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
   }
 
   function formatDiff(bet) {
-    if (!round.actualValue) return ''
+    if (round.actualValue === null || round.actualValue === undefined) return ''
     const diff = Math.abs(bet.value - round.actualValue)
     if (round.type === 'time') {
       const mins = Math.round(diff)
@@ -536,7 +531,6 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
               value={betName}
               onChange={(e) => setBetName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddBet()}
-              data-testid={`input-bet-name-${round.id}`}
             />
             <input
               type="text"
@@ -544,9 +538,8 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
               value={betValue}
               onChange={(e) => setBetValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddBet()}
-              data-testid={`input-bet-value-${round.id}`}
             />
-            <button className="btn btn-secondary" onClick={handleAddBet} data-testid={`button-add-bet-${round.id}`}>
+            <button className="btn btn-secondary" onClick={handleAddBet}>
               + Ajouter
             </button>
           </div>
@@ -563,7 +556,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
         <div className="close-round">
           <div className="form-group">
             <label>
-              {round.type === 'time' ? 'Heure d\'arrivée réelle' : 'Résultat réel'}
+              {round.type === 'time' ? "Heure d'arrivée réelle" : 'Résultat réel'}
             </label>
             <input
               type="text"
@@ -571,10 +564,9 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
               value={actualInput}
               onChange={(e) => setActualInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleClose()}
-              data-testid={`input-actual-${round.id}`}
             />
           </div>
-          <button className="btn btn-primary" onClick={handleClose} data-testid={`button-close-${round.id}`}>
+          <button className="btn btn-primary" onClick={handleClose}>
             Valider le résultat
           </button>
         </div>
@@ -584,7 +576,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
       {!isOpen && round.actualValue !== null && (
         <div className="result-box">
           <div className="result-box-title">
-            {round.type === 'time' ? 'Heure d\'arrivée' : 'Résultat'}
+            {round.type === 'time' ? "Heure d'arrivée" : 'Résultat'}
           </div>
           <div className="result-value">{formatValue(round.actualValue)}</div>
           {winners.length > 0 && (

@@ -140,6 +140,35 @@ a, button, input, select {
   }
 }
 
+/* === Setup banner === */
+.setup-banner {
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-primary);
+}
+
+.setup-banner strong {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+/* === Error banner === */
+.error-banner {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-3);
+  cursor: pointer;
+  border: 1px solid var(--color-error);
+}
+
 /* === Period filter === */
 .period-filter {
   display: flex;

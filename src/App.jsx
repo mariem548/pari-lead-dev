@@ -157,6 +157,7 @@ export default function App() {
   })
   // Story popup shows AFTER onboarding (mandatory read)
   const [showStory, setShowStory] = useState(false)
+  const [avatarEntrance, setAvatarEntrance] = useState(false)
   const [activeTab, setActiveTab] = useState('paris')
   const [profilePlayer, setProfilePlayer] = useState(null)
   const [showHallOfFame, setShowHallOfFame] = useState(false)
@@ -249,6 +250,8 @@ export default function App() {
         )
         showToast(`⚔️ ${name} a parié !`, 'info')
         playSound('bet')
+        setAvatarEntrance(true)
+        setTimeout(() => setAvatarEntrance(false), 100)
       } else {
         // Supabase: reload to get the bet with correct ID
         loadRounds()
@@ -353,6 +356,8 @@ export default function App() {
   // --- Render ---
   return (
     <div className="app">
+      <AvatarEntranceAnimation avatar={userAvatar} name={userName} trigger={avatarEntrance} />
+
       {/* Onboarding modal - mandatory, no skip */}
       {showOnboarding && (
         <OnboardingModal
@@ -367,6 +372,7 @@ export default function App() {
             } catch {}
             setShowOnboarding(false)
             setActiveTab('paris')
+            setAvatarEntrance(true)
             // Show mandatory story popup after onboarding
             const storySeen = sessionStorage.getItem(STORY_KEY)
             if (!storySeen) {
@@ -998,6 +1004,52 @@ function HallOfFameModal({ rounds, onClose }) {
 
 // === Confetti Overlay ===
 const CONFETTI_EMOJIS = ['⚔️', '🏹', '🛡️', '👑', '🏰', '🔥', '🏆', '⚔️', '🗡️', '🛡️']
+
+// === Avatar Entrance Animation ===
+function AvatarEntranceAnimation({ avatar, name, trigger }) {
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    if (trigger) {
+      setActive(true)
+      setTimeout(() => setActive(false), 2500)
+    }
+  }, [trigger])
+
+  if (!active) return null
+
+  // Map avatar to animation type
+  const AVATAR_ANIMATIONS = {
+    '🧙': { particle: '✨', effect: 'Fumée magique', class: 'anim-magic' },
+    '🔮': { particle: '✨', effect: 'Fumée magique', class: 'anim-magic' },
+    '🏹': { particle: '🏹', effect: 'Flèche', class: 'anim-arrow' },
+    '⚔️': { particle: '💨', effect: 'Galop', class: 'anim-horse' },
+    '🛡️': { particle: '💨', effect: 'Galop', class: 'anim-horse' },
+    '👑': { particle: '👑', effect: 'Couronne dorée', class: 'anim-crown' },
+    '🏰': { particle: '👑', effect: 'Couronne dorée', class: 'anim-crown' },
+    '📜': { particle: '📜', effect: 'Parchemin', class: 'anim-scroll' },
+    '🐉': { particle: '🔥', effect: 'Souffle de dragon', class: 'anim-fire' },
+    '🔥': { particle: '🔥', effect: 'Flammes', class: 'anim-fire' },
+    '🌙': { particle: '⭐', effect: 'Étoiles', class: 'anim-stars' },
+    '🗡️': { particle: '🗡️', effect: 'Lame', class: 'anim-blade' },
+  }
+
+  const anim = AVATAR_ANIMATIONS[avatar] || { particle: '✨', effect: 'Apparition', class: 'anim-magic' }
+
+  return (
+    <div className={`avatar-entrance ${anim.class}`}>
+      <div className="avatar-entrance-figure">
+        <span className="avatar-entrance-emoji">{avatar}</span>
+        <span className="avatar-entrance-name">{name}</span>
+      </div>
+      <div className="avatar-entrance-particles">
+        {[...Array(8)].map((_, i) => (
+          <span key={i} style={{ animationDelay: `${i * 0.1}s` }}>{anim.particle}</span>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // === Sound effects (Web Audio API) ===
 let audioCtx = null

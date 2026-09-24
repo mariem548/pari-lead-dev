@@ -9,6 +9,33 @@ import {
   formatTime,
 } from './lib/api'
 
+// === Story popup ===
+const STORY_KEY = 'pari-lead-dev-story-seen'
+
+function StoryPopup({ open, onClose }) {
+  if (!open) return null
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fermer">✕</button>
+        <div className="story-text">
+          <p>En cette noble époque, où les chevaliers servent leur royaume et où l'honneur guide les plus braves, une idée des plus audacieuses naquit au sein de notre illustre compagnie.</p>
+          <p>Face aux retards légendaires de notre très honorable et suprême Lead Dev, une question demeurait sans réponse : à quelle heure daignera-t-il enfin franchir les portes du royaume ?</p>
+          <p>C'est ainsi que, dans un élan de solidarité sans pareil, notre valeureuse équipe décida de créer une application permettant à chacun de mettre à l'épreuve son sens de la prophétie et de parier sur l'heure d'arrivée de notre illustre seigneur technique.</p>
+          <p>Mais nul projet d'une telle envergure n'aurait pu voir le jour sans le dévouement d'une âme particulièrement noble, douce et généreuse : <strong>Myriam</strong>.</p>
+          <p>Telle une chevaleresse au service de son royaume, elle sacrifia de son précieux temps, brava les épreuves du développement et consacra ses talents à cette noble entreprise. Après moult efforts, quelques batailles avec le code et probablement quelques soupirs, elle nous livra une œuvre magnifique : l'application officielle des paris sur l'arrivée de notre Suprême Lead Dev.</p>
+          <p className="story-finale">Que les paris commencent.</p>
+          <p className="story-finale">Que les prophéties s'affrontent.</p>
+          <p className="story-finale">Et que le plus juste des chevaliers — ou le plus grand des devins — remporte la victoire.</p>
+        </div>
+        <button className="btn btn-primary modal-btn" onClick={onClose}>
+          Que les paris commencent
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // === Theme ===
 function useTheme() {
   const [theme, setTheme] = useState(() => {
@@ -50,6 +77,22 @@ export default function App() {
   const [period, setPeriod] = useState('all')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [showStory, setShowStory] = useState(() => {
+    try {
+      return !sessionStorage.getItem(STORY_KEY)
+    } catch {
+      return true
+    }
+  })
+
+  function closeStory() {
+    setShowStory(false)
+    try {
+      sessionStorage.setItem(STORY_KEY, '1')
+    } catch {
+      // sessionStorage blocked
+    }
+  }
 
   // Load data
   const loadRounds = useCallback(async () => {
@@ -221,6 +264,9 @@ export default function App() {
         <button className="theme-toggle" onClick={toggle} aria-label="Changer de thème">
           {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
         </button>
+        <button className="story-toggle" onClick={() => setShowStory(true)} aria-label="Notre histoire">
+          📜
+        </button>
       </header>
 
       {/* Setup banner */}
@@ -230,6 +276,9 @@ export default function App() {
           Pour partager avec toute l'équipe, configurez Supabase (voir le README).
         </div>
       )}
+
+      {/* Story popup */}
+      <StoryPopup open={showStory} onClose={closeStory} />
 
       {/* Error */}
       {error && (

@@ -812,7 +812,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
         </div>
       )}
 
-      {/* Distribution chart */}
+      {/* Carte des prédictions */}
       {round.bets.length > 0 && (
         <DistributionChart round={round} />
       )}
@@ -820,7 +820,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
   )
 }
 
-// === Distribution Chart ===
+// === Carte des prédictions ===
 function DistributionChart({ round }) {
   const [show, setShow] = useState(false)
 
@@ -832,8 +832,8 @@ function DistributionChart({ round }) {
 
   return (
     <div className="dist-chart-section">
-      <button className="comments-toggle" onClick={() => setShow(!show)}>
-        📊 Distribution {show ? '▲' : '▼'}
+      <button className="dist-toggle" onClick={() => setShow(!show)}>
+        📜 Carte des prédictions {show ? '▲' : '▼'}
       </button>
       {show && (
         <div className="dist-chart">

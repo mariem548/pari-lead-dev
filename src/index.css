@@ -874,9 +874,20 @@ input::placeholder {
   font-size: 1rem;
 }
 
-/* === Distribution chart === */
+/* === Carte des prédictions === */
 .dist-chart-section {
   margin-top: var(--space-3);
+}
+
+.dist-toggle {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  background: transparent;
+}
+
+.dist-toggle:hover {
+  color: var(--color-primary);
 }
 
 .dist-chart {

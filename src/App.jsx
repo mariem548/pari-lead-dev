@@ -8,6 +8,9 @@ import {
   formatDate,
   filterRoundsByPeriod,
   formatTime,
+  formatDelay,
+  computeDelayMinutes,
+  WORK_START_MINUTES,
 } from './lib/api'
 
 // === Avatars ===
@@ -825,6 +828,9 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
             Heure d'arrivée
           </div>
           <div className="result-value">{formatValue(round.actualValue)}</div>
+          {round.actualValue !== null && round.actualValue !== undefined && (
+            <div className="result-delay">{formatDelay(round.actualValue)}</div>
+          )}
           {winners.length > 0 && (
             <div className="result-winner">
               {winners.length === 1 ? (
@@ -1798,6 +1804,7 @@ function GameRulesModal({ open, onClose }) {
         <div className="rules-section">
           <h3>🏆 Score & points</h3>
           <p>Le joueur dont la prédiction est la <strong>plus proche</strong> de l'heure réelle gagne <strong>1 point</strong>. En cas d'égalité parfaite, tous les ex aequo gagnent. Les points s'accumulent au fil des paris.</p>
+          <p>Le retard du Lead Dev est calculé à partir de <strong>9h35</strong> (heure officielle de début). Si le Lead Dev arrive à 10h02, son retard est de <strong>27 minutes</strong>.</p>
         </div>
 
         <div className="rules-section">

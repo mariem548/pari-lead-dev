@@ -767,6 +767,13 @@ input::placeholder {
   color: var(--color-primary);
 }
 
+.result-delay {
+  font-size: var(--text-sm);
+  color: var(--color-gold);
+  font-family: 'Cinzel', serif;
+  margin-top: var(--space-1);
+}
+
 .result-winner {
   display: flex;
   align-items: center;

@@ -148,6 +148,22 @@ export function formatTime(minutes) {
   return `${h}h${String(m).padStart(2, '0')}`
 }
 
+// === Lateness (retard) — work starts at 9h35 ===
+export const WORK_START_MINUTES = 9 * 60 + 35
+
+export function computeDelayMinutes(arrivalMinutes) {
+  if (arrivalMinutes === null || arrivalMinutes === undefined) return null
+  return Math.max(0, Math.round(arrivalMinutes - WORK_START_MINUTES))
+}
+
+export function formatDelay(arrivalMinutes) {
+  if (arrivalMinutes === null || arrivalMinutes === undefined) return ''
+  const diff = Math.round(arrivalMinutes - WORK_START_MINUTES)
+  if (diff < 0) return `${Math.abs(diff)} min d'avance`
+  if (diff === 0) return "pile a l'heure"
+  return `${diff} min de retard`
+}
+
 // === SUPABASE API ===
 
 // Map DB row to app model

@@ -6,6 +6,14 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [3.3.0] - 2026-09-25
+
+### Added
+- Calcul du retard du Lead Dev a partir de 9h35 (heure officielle de debut)
+- `computeDelayMinutes` et `formatDelay` dans api.js
+- Affichage du retard a cote de l'heure d'arrivee dans les resultats
+- Regles du jeu mentionnent le calcul de retard a partir de 9h35
+
 ## [3.2.0] - 2026-09-25
 
 ### Added

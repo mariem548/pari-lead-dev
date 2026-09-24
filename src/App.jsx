@@ -62,6 +62,42 @@ function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 }
 
+// === Date helpers ===
+function formatDate(ts) {
+  if (!ts) return ''
+  const d = new Date(ts)
+  const days = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam']
+  const months = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc']
+  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`
+}
+
+function isThisWeek(ts) {
+  if (!ts) return false
+  const now = new Date()
+  const day = now.getDay()
+  const monday = new Date(now)
+  const diff = day === 0 ? -6 : 1 - day
+  monday.setDate(now.getDate() + diff)
+  monday.setHours(0, 0, 0, 0)
+  return new Date(ts) >= monday
+}
+
+function isThisMonth(ts) {
+  if (!ts) return false
+  const now = new Date()
+  const d = new Date(ts)
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+}
+
+function filterRoundsByPeriod(rounds, period) {
+  if (period === 'all') return rounds
+  return rounds.filter((r) => {
+    if (period === 'week') return isThisWeek(r.createdAt)
+    if (period === 'month') return isThisMonth(r.createdAt)
+    return true
+  })
+}
+
 // === Winner calculation ===
 function computeWinners(round) {
   if (!round.actualValue || round.bets.length === 0) return []
@@ -128,12 +164,14 @@ function MoonIcon() {
 export default function App() {
   const { theme, toggle } = useTheme()
   const [data, setData] = useState(loadData)
+  const [period, setPeriod] = useState('all')
 
   useEffect(() => {
     saveData(data)
   }, [data])
 
-  const leaderboard = useMemo(() => computeLeaderboard(data.rounds), [data.rounds])
+  const filteredRounds = useMemo(() => filterRoundsByPeriod(data.rounds, period), [data.rounds, period])
+  const leaderboard = useMemo(() => computeLeaderboard(filteredRounds), [filteredRounds])
 
   // --- Actions ---
   function createRound(name, type) {
@@ -147,6 +185,7 @@ export default function App() {
       status: 'open',
       winners: [],
       pointsPerWin: 1,
+      createdAt: Date.now(),
     }
     setData((d) => ({ ...d, rounds: [...d.rounds, round] }))
   }
@@ -229,6 +268,30 @@ export default function App() {
       {/* New round form */}
       <NewRoundForm onCreate={createRound} />
 
+      {/* Period filter */}
+      {data.rounds.length > 0 && (
+        <div className="period-filter">
+          <button
+            className={`period-btn ${period === 'week' ? 'active' : ''}`}
+            onClick={() => setPeriod('week')}
+          >
+            Cette semaine
+          </button>
+          <button
+            className={`period-btn ${period === 'month' ? 'active' : ''}`}
+            onClick={() => setPeriod('month')}
+          >
+            Ce mois
+          </button>
+          <button
+            className={`period-btn ${period === 'all' ? 'active' : ''}`}
+            onClick={() => setPeriod('all')}
+          >
+            Tout
+          </button>
+        </div>
+      )}
+
       {/* Rounds */}
       {data.rounds.length === 0 ? (
         <div className="empty-state">
@@ -236,10 +299,19 @@ export default function App() {
           <h3>Aucun pari pour le moment</h3>
           <p>Créez un premier pari ci-dessus pour commencer à jouer !</p>
         </div>
+      ) : filteredRounds.length === 0 ? (
+        <>
+          <h2 className="section-title">Paris en cours</h2>
+          <div className="empty-state" style={{ padding: 'var(--space-8) var(--space-4)' }}>
+            <div className="empty-state-icon" style={{ fontSize: '2rem' }}>📅</div>
+            <h3 style={{ fontSize: 'var(--text-base)' }}>Aucun pari sur cette période</h3>
+            <p>Changez de filtre ou créez un nouveau pari.</p>
+          </div>
+        </>
       ) : (
         <>
           <h2 className="section-title">Paris en cours</h2>
-          {data.rounds.map((round) => (
+          {filteredRounds.map((round) => (
             <RoundCard
               key={round.id}
               round={round}
@@ -256,7 +328,9 @@ export default function App() {
       {/* Leaderboard */}
       {leaderboard.length > 0 && (
         <>
-          <h2 className="section-title">Classement général</h2>
+          <h2 className="section-title">
+            Classement {period === 'week' ? 'de la semaine' : period === 'month' ? 'du mois' : 'général'}
+          </h2>
           <div className="card">
             <div className="leaderboard">
               {leaderboard.map((entry, i) => (
@@ -404,7 +478,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete }
         <div>
           <div className="card-title">{round.name}</div>
           <div className="card-subtitle">
-            {round.type === 'time' ? 'Pari sur une heure' : 'Pari sur un nombre'} — {round.bets.length} participant{round.bets.length > 1 ? 's' : ''}
+            {round.type === 'time' ? 'Pari sur une heure' : 'Pari sur un nombre'} — {round.bets.length} participant{round.bets.length > 1 ? 's' : ''}{round.createdAt ? ` — ${formatDate(round.createdAt)}` : ''}
           </div>
         </div>
         <span className={`badge ${isOpen ? 'badge-open' : 'badge-closed'}`}>

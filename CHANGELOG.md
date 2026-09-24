@@ -6,7 +6,13 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-## [1.8.0] - 2026-09-24
+## [1.9.0] - 2026-09-24
+
+### Added
+- Profils joueurs cliquables : cliquez sur un nom dans le classement pour voir ses stats
+- Hall of Fame : les 5 meilleures prédictions de l'histoire avec écart
+- Stats détaillées : points, victoires, défaites, win rate, séries
+- Bouton Hall of Fame dans la section classement
 
 ### Added
 - Série de victoires : affichage des streaks dans le classement (ex: 🔥 3)

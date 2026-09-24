@@ -4,6 +4,7 @@ import {
   api,
   computeWinners,
   computeLeaderboard,
+  computeHallOfFame,
   formatDate,
   filterRoundsByPeriod,
   formatTime,
@@ -102,6 +103,8 @@ export default function App() {
       return true
     }
   })
+  const [profilePlayer, setProfilePlayer] = useState(null)
+  const [showHallOfFame, setShowHallOfFame] = useState(false)
   const [userName, setUserName] = useState(() => {
     try {
       return sessionStorage.getItem('pari-lead-dev-user') || ''
@@ -301,6 +304,16 @@ export default function App() {
       {/* Story popup */}
       <StoryPopup open={showStory} onClose={closeStory} />
 
+      {/* Profile modal */}
+      {profilePlayer && (
+        <ProfileModal player={profilePlayer} onClose={() => setProfilePlayer(null)} />
+      )}
+
+      {/* Hall of Fame modal */}
+      {showHallOfFame && (
+        <HallOfFameModal rounds={rounds} onClose={() => setShowHallOfFame(false)} />
+      )}
+
       {/* Error */}
       {error && (
         <div className="error-banner" onClick={() => setError('')}>
@@ -378,6 +391,9 @@ export default function App() {
         <>
           <h2 className="section-title">
             Classement {period === 'week' ? 'de la semaine' : period === 'month' ? 'du mois' : 'général'}
+            <button className="btn btn-secondary hall-of-fame-btn" onClick={() => setShowHallOfFame(true)}>
+              🏆 Hall of Fame
+            </button>
           </h2>
           <div className="card">
             <div className="leaderboard">
@@ -385,7 +401,7 @@ export default function App() {
                 <div key={entry.name} className={`leaderboard-item rank-${i + 1}`}>
                   <div className="leaderboard-rank">{i + 1}</div>
                   <span className="leaderboard-avatar">{entry.avatar || '🛡️'}</span>
-                  <div className="leaderboard-name">{entry.name}</div>
+                  <button className="leaderboard-name clickable" onClick={() => setProfilePlayer(entry)}>{entry.name}</button>
                   {entry.currentStreak >= 2 && (
                     <span className="streak-badge">🔥 {entry.currentStreak}</span>
                   )}
@@ -838,6 +854,88 @@ function CommentsSection({ roundId, userAvatar }) {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// === Profile Modal ===
+function ProfileModal({ player, onClose }) {
+  const total = player.wins + player.losses
+  const winRate = total > 0 ? Math.round((player.wins / total) * 100) : 0
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="profile-header">
+          <span className="profile-avatar-lg">{player.avatar || '🛡️'}</span>
+          <h2>{player.name}</h2>
+        </div>
+        <div className="profile-stats">
+          <div className="profile-stat">
+            <span className="stat-value">{player.score}</span>
+            <span className="stat-label">Points</span>
+          </div>
+          <div className="profile-stat">
+            <span className="stat-value">{player.wins}</span>
+            <span className="stat-label">Victoires</span>
+          </div>
+          <div className="profile-stat">
+            <span className="stat-value">{player.losses}</span>
+            <span className="stat-label">Défaites</span>
+          </div>
+          <div className="profile-stat">
+            <span className="stat-value">{winRate}%</span>
+            <span className="stat-label">Win rate</span>
+          </div>
+          <div className="profile-stat">
+            <span className="stat-value">{player.currentStreak}</span>
+            <span className="stat-label">Série actuelle</span>
+          </div>
+          <div className="profile-stat">
+            <span className="stat-value">{player.bestStreak}</span>
+            <span className="stat-label">Meilleure série</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// === Hall of Fame Modal ===
+function HallOfFameModal({ rounds, onClose }) {
+  const hallOfFame = useMemo(() => computeHallOfFame(rounds), [rounds])
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <h2>🏆 Hall of Fame</h2>
+        <p className="modal-subtitle">Les meilleures prédictions de l'histoire</p>
+        {hallOfFame.length === 0 ? (
+          <p className="empty-state-text">Aucun pari clôturé pour le moment</p>
+        ) : (
+          <div className="hall-of-fame-list">
+            {hallOfFame.map((entry, i) => (
+              <div key={i} className={`hof-item ${entry.isWinner ? 'winner' : ''}`}>
+                <span className="hof-rank">#{i + 1}</span>
+                <span className="hof-avatar">{entry.avatar || '🛡️'}</span>
+                <div className="hof-info">
+                  <span className="hof-name">{entry.name}</span>
+                  <span className="hof-detail">
+                    {entry.type === 'time' ? formatTime(entry.value) : entry.value}
+                    {' → '}
+                    {entry.type === 'time' ? formatTime(entry.actualValue) : entry.actualValue}
+                    {' ('}écart: {entry.diff}{entry.type === 'time' ? ' min' : ''}{')'}
+                  </span>
+                  <span className="hof-round">{entry.roundName}</span>
+                </div>
+                {entry.isWinner && <span className="hof-badge">👑 Gagnant</span>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

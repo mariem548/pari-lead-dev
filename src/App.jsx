@@ -514,6 +514,7 @@ export default function App() {
               round={round}
               onAddBet={addBet}
               userAvatar={userAvatar}
+              userName={userName}
               setUserAvatar={(a) => {
                 setUserAvatar(a)
                 try { sessionStorage.setItem(AVATAR_KEY, a) } catch {}
@@ -576,6 +577,7 @@ export default function App() {
           leaderboard={leaderboard}
           onPlayerClick={setProfilePlayer}
           rounds={rounds}
+          onOpenHallOfFame={() => setShowHallOfFame(true)}
         />
       )}
     </div>
@@ -663,8 +665,7 @@ function NewRoundForm({ onCreate }) {
 }
 
 // === Round Card ===
-function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, userAvatar, setUserAvatar }) {
-  const [betName, setBetName] = useState('')
+function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, userAvatar, setUserAvatar, userName }) {
   const [betValue, setBetValue] = useState('')
   const [actualInput, setActualInput] = useState(round.actualInput || '')
   const [error, setError] = useState('')
@@ -673,15 +674,14 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
   const winners = round.winners || []
 
   function handleAddBet() {
-    if (!betName.trim() || !betValue.trim()) return
+    if (!betValue.trim()) return
     const value = round.type === 'time' ? parseTimeLocal(betValue) : parseNumberLocal(betValue)
     if (value === null) {
       setError(round.type === 'time' ? 'Format invalide. Ex: 9.30, 9:30, 10h00' : 'Nombre invalide')
       return
     }
     setError('')
-    onAddBet(round.id, betName, betValue, round.type, userAvatar)
-    setBetName('')
+    onAddBet(round.id, userName, betValue, round.type, userAvatar)
     setBetValue('')
   }
 
@@ -778,13 +778,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
           <div className="add-bet-form">
             <div className="bet-form-profile">
               <span className="bet-form-avatar">{userAvatar || '🛡️'}</span>
-              <input
-                type="text"
-                placeholder="Prénom"
-                value={betName}
-                onChange={(e) => setBetName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddBet()}
-              />
+              <span className="bet-form-name">{userName || 'Anonyme'}</span>
             </div>
             <input
               type="text"
@@ -1137,13 +1131,18 @@ function MonthlyRecap({ rounds }) {
   // Show toast when recap becomes available and hasn't been seen
   useEffect(() => {
     if (recap && !recapSeen) {
-      const month = new Date().getMonth()
-      try {
-        sessionStorage.setItem('pari-lead-dev-recap-seen', String(month))
-      } catch {}
-      setRecapSeen(true)
+      // Badge stays visible until user opens the recap
     }
   }, [recap, recapSeen])
+
+  function openRecap() {
+    setShow(true)
+    try {
+      const month = new Date().getMonth()
+      sessionStorage.setItem('pari-lead-dev-recap-seen', String(month))
+    } catch {}
+    setRecapSeen(true)
+  }
 
   if (!recap) return null
 
@@ -1166,7 +1165,7 @@ function MonthlyRecap({ rounds }) {
 
   return (
     <>
-      <button className="btn btn-secondary monthly-recap-btn" onClick={() => setShow(true)}>
+      <button className="btn btn-secondary monthly-recap-btn" onClick={openRecap}>
         📜 Parchemin Royal du Mois
         {!recapSeen && <span className="recap-badge">!</span>}
       </button>
@@ -1243,7 +1242,7 @@ function MonthlyRecap({ rounds }) {
 }
 
 // === Kingdom Leaderboard (Classement + Carte du royaume) ===
-function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds }) {
+function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFame }) {
   const maxScore = Math.max(...leaderboard.map((e) => e.score), 1)
   const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 
@@ -1308,7 +1307,7 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds }) {
       {/* Actions */}
       <div className="header-actions" style={{ justifyContent: 'center', marginTop: 'var(--space-4)' }}>
         <MonthlyRecap rounds={rounds} />
-        <button className="btn btn-secondary hall-of-fame-btn" onClick={() => {}}>
+        <button className="btn btn-secondary hall-of-fame-btn" onClick={onOpenHallOfFame}>
           🏆 Hall of Fame
         </button>
       </div>

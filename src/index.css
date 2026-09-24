@@ -1563,6 +1563,13 @@ input::placeholder {
   flex-shrink: 0;
 }
 
+.bet-form-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-family: 'Cinzel', serif;
+}
+
 .bet-form-profile input {
   flex: 1;
 }

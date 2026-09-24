@@ -330,7 +330,7 @@ export default function App() {
   }
 
   // --- Loading state ---
-  if (loading) {
+  if (loading && !showOnboarding) {
     return (
       <div className="app">
         <header className="header">

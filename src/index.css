@@ -1156,6 +1156,107 @@ input::placeholder {
   }
 }
 
+/* === Monthly Recap (Parchemin Royal) === */
+.monthly-recap-btn {
+  white-space: nowrap;
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.monthly-recap-modal {
+  max-width: 560px;
+}
+
+.recap-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.recap-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-gold);
+  background: var(--color-surface-2);
+}
+
+.recap-item.recap-late { border-left-color: var(--color-error); }
+.recap-item.recap-early { border-left-color: var(--color-success); }
+.recap-item.recap-predictor { border-left-color: var(--color-gold); }
+.recap-item.recap-precise { border-left-color: var(--color-primary); }
+
+.recap-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.recap-text {
+  flex: 1;
+}
+
+.recap-text strong {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.recap-text p {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.recap-winner {
+  margin-top: var(--space-1) !important;
+  font-size: var(--text-xs) !important;
+  color: var(--color-gold) !important;
+  font-weight: 500;
+}
+
+.recap-stats {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.recap-stat {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.recap-stat-value {
+  display: block;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-gold);
+  font-family: 'Cinzel', serif;
+}
+
+.recap-stat-label {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.recap-close-btn {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
 /* === Onboarding === */
 .onboarding-modal {
   max-width: 520px;

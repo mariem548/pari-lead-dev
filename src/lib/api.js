@@ -403,4 +403,78 @@ export const api = {
       supabase.removeChannel(channel)
     }
   },
+
+  computeMonthlyRecap(rounds) {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth()
+
+    const closedTimeRounds = rounds.filter((r) => {
+      if (r.type !== 'time' || r.actualValue === null || !r.closedAt) return false
+      const d = new Date(r.closedAt)
+      return d.getFullYear() === year && d.getMonth() === month
+    })
+
+    if (closedTimeRounds.length === 0) return null
+
+    const roundsWithWinners = closedTimeRounds.map((r) => ({
+      ...r,
+      winners: computeWinners(r.bets, r.actualValue),
+    }))
+
+    // Latest arrival (max actualValue)
+    const latest = roundsWithWinners.reduce((a, b) => (a.actualValue > b.actualValue ? a : b))
+
+    // Earliest arrival (min actualValue)
+    const earliest = roundsWithWinners.reduce((a, b) => (a.actualValue < b.actualValue ? a : b))
+
+    // Best predictor of the month (most wins)
+    const winCounts = {}
+    roundsWithWinners.forEach((r) => {
+      r.winners.forEach((w) => {
+        const bet = r.bets.find((b) => b.id === w)
+        if (!bet) return
+        const key = bet.name
+        if (!winCounts[key]) winCounts[key] = { name: bet.name, avatar: bet.avatar, wins: 0, points: 0 }
+        winCounts[key].wins++
+      })
+    })
+    const topPredictor = Object.values(winCounts).sort((a, b) => b.wins - a.wins)[0] || null
+
+    // Most precise prediction of the month
+    let bestBet = null
+    let bestDiff = Infinity
+    roundsWithWinners.forEach((r) => {
+      r.bets.forEach((bet) => {
+        const diff = Math.abs(bet.value - r.actualValue)
+        if (diff < bestDiff) {
+          bestDiff = diff
+          bestBet = { ...bet, roundName: r.name, diff, actualValue: r.actualValue }
+        }
+      })
+    })
+
+    // Average arrival time
+    const avgArrival = roundsWithWinners.reduce((sum, r) => sum + r.actualValue, 0) / roundsWithWinners.length
+
+    // Winner names for latest/earliest
+    const latestWinners = latest.winners.map((w) => {
+      const bet = latest.bets.find((b) => b.id === w)
+      return bet ? { name: bet.name, avatar: bet.avatar } : null
+    }).filter(Boolean)
+
+    const earliestWinners = earliest.winners.map((w) => {
+      const bet = earliest.bets.find((b) => b.id === w)
+      return bet ? { name: bet.name, avatar: bet.avatar } : null
+    }).filter(Boolean)
+
+    return {
+      latest: { round: latest, winners: latestWinners },
+      earliest: { round: earliest, winners: earliestWinners },
+      topPredictor,
+      bestBet,
+      avgArrival,
+      totalRounds: closedTimeRounds.length,
+    }
+  },
 }

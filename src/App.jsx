@@ -490,9 +490,12 @@ export default function App() {
         <>
           <h2 className="section-title">
             Classement {period === 'week' ? 'de la semaine' : period === 'month' ? 'du mois' : 'général'}
-            <button className="btn btn-secondary hall-of-fame-btn" onClick={() => setShowHallOfFame(true)}>
-              🏆 Hall of Fame
-            </button>
+            <div className="header-actions">
+              <MonthlyRecap rounds={rounds} />
+              <button className="btn btn-secondary hall-of-fame-btn" onClick={() => setShowHallOfFame(true)}>
+                🏆 Hall of Fame
+              </button>
+            </div>
           </h2>
           <div className="card">
             <div className="leaderboard">
@@ -1061,6 +1064,107 @@ function ConfettiOverlay() {
         </span>
       ))}
     </div>
+  )
+}
+
+// === Monthly Recap (Parchemin Royal) ===
+function MonthlyRecap({ rounds }) {
+  const [show, setShow] = useState(false)
+
+  const recap = useMemo(() => api.computeMonthlyRecap(rounds), [rounds])
+  if (!recap) return null
+
+  const monthName = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+
+  function formatTime(val) {
+    const rounded = Math.round(val)
+    const h = Math.floor(rounded / 60)
+    const m = rounded % 60
+    return `${h}h${m.toString().padStart(2, '0')}`
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr)
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+  }
+
+  const latestDate = recap.latest.round.closedAt
+  const earliestDate = recap.earliest.round.closedAt
+
+  return (
+    <>
+      <button className="btn btn-secondary monthly-recap-btn" onClick={() => setShow(true)}>
+        📜 Parchemin Royal du Mois
+      </button>
+      {show && (
+        <div className="modal-overlay" onClick={() => setShow(false)}>
+          <div className="modal monthly-recap-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShow(false)}>✕</button>
+            <h2>📜 Parchemin Royal</h2>
+            <p className="modal-subtitle">Chroniques de {monthName}</p>
+
+            <div className="recap-section">
+              <div className="recap-item recap-late">
+                <span className="recap-icon">🐌</span>
+                <div className="recap-text">
+                  <strong>Arrivée la plus tardive</strong>
+                  <p>Le Suprême Lead Dev a brillé par son retard le <strong>{formatDate(latestDate)}</strong> à <strong>{formatTime(recap.latest.round.actualValue)}</strong>.</p>
+                  {recap.latest.winners.length > 0 && (
+                    <p className="recap-winner">👏 Le royaume applaudit {recap.latest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} — grand{recap.latest.winners.length > 1 ? 's' : ''} prophète{recap.latest.winners.length > 1 ? 's' : ''} du jour !</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="recap-item recap-early">
+                <span className="recap-icon">⚡</span>
+                <div className="recap-text">
+                  <strong>Arrivée la plus tôt</strong>
+                  <p>Notre Lead Dev a daigné se lever tôt le <strong>{formatDate(earliestDate)}</strong> à <strong>{formatTime(recap.earliest.round.actualValue)}</strong>.</p>
+                  {recap.earliest.winners.length > 0 && (
+                    <p className="recap-winner">👏 Félicitations à {recap.earliest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} pour cette prédiction matiale !</p>
+                  )}
+                </div>
+              </div>
+
+              {recap.topPredictor && (
+                <div className="recap-item recap-predictor">
+                  <span className="recap-icon">👑</span>
+                  <div className="recap-text">
+                    <strong>Grand Oracle du mois</strong>
+                    <p>{recap.topPredictor.avatar || ''} <strong>{recap.topPredictor.name}</strong> a remporté <strong>{recap.topPredictor.wins}</strong> pari{recap.topPredictor.wins > 1 ? 's' : ''} ce mois-ci !</p>
+                  </div>
+                </div>
+              )}
+
+              {recap.bestBet && (
+                <div className="recap-item recap-precise">
+                  <span className="recap-icon">🎯</span>
+                  <div className="recap-text">
+                    <strong>Prédiction la plus précise</strong>
+                    <p>{recap.bestBet.avatar || ''} <strong>{recap.bestBet.name}</strong> a deviné l&rsquo;heure à <strong>{formatTime(recap.bestBet.value)}</strong> pour « {recap.bestBet.roundName} » — pile à {recap.bestBet.diff === 0 ? "l'heure exacte !" : `${recap.bestBet.diff} min près`}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="recap-stats">
+                <div className="recap-stat">
+                  <span className="recap-stat-value">{recap.totalRounds}</span>
+                  <span className="recap-stat-label">Paris ce mois-ci</span>
+                </div>
+                <div className="recap-stat">
+                  <span className="recap-stat-value">{formatTime(recap.avgArrival)}</span>
+                  <span className="recap-stat-label">Heure d'arrivée moyenne</span>
+                </div>
+              </div>
+            </div>
+
+            <button className="btn btn-primary recap-close-btn" onClick={() => setShow(false)}>
+              ⚔️ Fermer le parchemin
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

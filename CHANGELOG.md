@@ -6,6 +6,26 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [2.3.0] - 2026-09-25
+
+### Added
+- Parchemin Royal du mois : récap mensuel avec arrivée la plus tardive/tôt, Grand Oracle, prédiction la plus précise
+- Bouton "Parchemin Royal du Mois" dans la section classement
+
+### Changed
+- Logo redessiné : gardien aux épées croisées protégeant le château GIT
+- Favicon mis à jour pour correspondre au nouveau logo
+- "Distribution" renommé en "Carte des prédictions" (thème médiéval)
+
+## [2.2.0] - 2026-09-25
+
+### Added
+- Onboarding au premier lancement : choix du nom + avatar parmi 12 personnages médiévaux
+- Animation chevalier à cheval qui traverse l'écran toutes les 20 secondes
+
+### Removed
+- Section commentaires/chat des paris (supprimée)
+
 ## [2.0.0] - 2026-09-24
 
 ### Added

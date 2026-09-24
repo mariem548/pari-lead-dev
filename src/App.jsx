@@ -1728,7 +1728,7 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
                 className={`kingdom-player rank-${rank}`}
                 style={{ left: `${Math.max(5, Math.min(progress - 3, 88))}%`, top: `${(i % 3) * 35 + 10}px` }}
                 onClick={() => onPlayerClick(entry)}
-                title={`${entry.name} — ${entry.score} pt${entry.score > 1 ? 's' : ''} — ${getMedievalTitle(entry.score).title}`}
+                title={`${entry.name} — ${entry.score} pt${entry.score > 1 ? 's' : ''} — ${getMedievalTitle(entry.score).title} — ${getPlayerHouse(entry.name).name}`}
               >
                 <span className="kingdom-player-avatar">{entry.avatar || '🛡️'}</span>
                 {isLeader && <span className="kingdom-crown">👑</span>}
@@ -1753,6 +1753,7 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
             )}
             <div className="leaderboard-score">{entry.score} pt{entry.score > 1 ? 's' : ''}</div>
             <div className="leaderboard-title">{getMedievalTitle(entry.score).icon} {getMedievalTitle(entry.score).title}</div>
+            <div className="leaderboard-house">{getPlayerHouse(entry.name).icon} {getPlayerHouse(entry.name).name}</div>
           </div>
         ))}
       </div>
@@ -1760,6 +1761,16 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
       {/* Joust + Tournament */}
       <PlayerJoust leaderboard={leaderboard} />
       <MonthlyTournament rounds={rounds} />
+
+      {/* Fun cards grid */}
+      <div className="kingdom-fun-grid">
+        <RoyalTribunal rounds={rounds} />
+        <WantedPoster rounds={rounds} />
+        <FeudalTax rounds={rounds} />
+        <CarrierPigeon rounds={rounds} />
+        <DungeonOfShame rounds={rounds} />
+        <ExcuseMarket rounds={rounds} />
+      </div>
 
       {/* Actions */}
       <div className="header-actions" style={{ justifyContent: 'center', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
@@ -1770,6 +1781,228 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
         <button className="btn btn-secondary hall-of-fame-btn" onClick={onOpenHallOfFame}>
           🏆 Hall of Fame
         </button>
+      </div>
+    </div>
+  )
+}
+
+// === Royal Tribunal ===
+const TRIBUNAL_VERDICTS = [
+  { max: 0, verdict: 'acquitte', icon: '⚖️', text: "Le tribunal royal acquitte le Lead Dev. Arrive pile a l'heure, une rarete digne des legendes." },
+  { max: 15, verdict: 'rappel', icon: '⚖️', text: "Le tribunal rappelle le Lead Dev a l'ordre pour un retard de {delay} minutes. Le royaume lui accorde le benefice du doute." },
+  { max: 45, verdict: 'coupable', icon: '⚖️', text: 'Le tribunal declare le Lead Dev coupable de {delay} minutes de retard. La couronne exige reparation.' },
+  { max: 999, verdict: 'aggravantes', icon: '⚖️', text: "Le tribunal declare le Lead Dev coupable de {delay} minutes de retard avec circonstances aggravantes. Le donjon l'attend." },
+]
+
+function RoyalTribunal({ rounds }) {
+  const lastClosed = useMemo(() => {
+    const closed = rounds.filter((r) => r.status === 'closed' && r.actualValue !== null)
+    if (closed.length === 0) return null
+    return closed.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt))[0]
+  }, [rounds])
+
+  if (!lastClosed) return null
+
+  const delay = computeDelayMinutes(lastClosed.actualValue)
+  if (delay === null) return null
+
+  const verdict = TRIBUNAL_VERDICTS.find((v) => delay <= v.max) || TRIBUNAL_VERDICTS[TRIBUNAL_VERDICTS.length - 1]
+  const text = verdict.text.replace('{delay}', delay)
+
+  return (
+    <div className="fun-card">
+      <div className="fun-card-title">{verdict.icon} Tribunal Royal du Retard</div>
+      <div className="fun-card-value">{delay} min de retard</div>
+      <div className="fun-card-muted">{text}</div>
+    </div>
+  )
+}
+
+// === Wanted Poster ===
+const WANTED_LOCATIONS = [
+  'pres de la machine a cafe',
+  'dans les toilettes du 2e etage',
+  "devant le frigo de l'open space",
+  'pres de la baie vitree',
+  "dans l'ascenseur",
+  'au distributeur de snacks',
+  'dans la salle de reunion abandonnee',
+  'pres du radiateur qui fait du bruit',
+]
+const WANTED_DESCRIPTIONS = [
+  'cheveux en bataille, semblait perdu',
+  'regard vitreux, marmonnait des excuses',
+  'sac a dos ouvert, trail de cafe derriere lui',
+  'essouffle, cravate de travers',
+  'yeux mi-clos, cherche son badge',
+]
+
+function WantedPoster({ rounds }) {
+  const lastClosed = useMemo(() => {
+    const closed = rounds.filter((r) => r.status === 'closed' && r.actualValue !== null)
+    if (closed.length === 0) return null
+    return closed.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt))[0]
+  }, [rounds])
+
+  if (!lastClosed) return null
+
+  const dateStr = new Date(lastClosed.closedAt).toDateString()
+  const locIndex = dateStr.length % WANTED_LOCATIONS.length
+  const descIndex = dateStr.length % WANTED_DESCRIPTIONS.length
+
+  return (
+    <div className="fun-card wanted-card">
+      <div className="fun-card-title">🔎 Avis de Recherche</div>
+      <div className="fun-card-value">Le Lead Dev</div>
+      <div className="fun-card-muted">
+        Vu pour la dernière fois {WANTED_LOCATIONS[locIndex]}, {WANTED_DESCRIPTIONS[descIndex]}.
+      </div>
+    </div>
+  )
+}
+
+// === Feudal Tax ===
+function FeudalTax({ rounds }) {
+  const lastClosed = useMemo(() => {
+    const closed = rounds.filter((r) => r.status === 'closed' && r.actualValue !== null)
+    if (closed.length === 0) return null
+    return closed.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt))[0]
+  }, [rounds])
+
+  if (!lastClosed) return null
+
+  const delay = computeDelayMinutes(lastClosed.actualValue)
+  if (delay === null || delay === 0) return null
+
+  const tax = delay * 2
+
+  return (
+    <div className="fun-card">
+      <div className="fun-card-title">💰 Taxe Féodale du Retard</div>
+      <div className="fun-card-value">{tax} pièces</div>
+      <div className="fun-card-muted">Le royaume prélève {tax} pièces pour {delay} minutes de retard.</div>
+    </div>
+  )
+}
+
+// === Carrier Pigeon ===
+const PIGEON_MESSAGES = [
+  'Coop coop ! Le Lead Dev a ete apercu pres de la taverne CI/CD.',
+  'Le pigeon rapporte un retard suspect dans les plaines du stand-up.',
+  "Coop ! Un nuage de cafe annonce l'arrivee imminente du Lead Dev.",
+  'Le pigeon a vu le Lead Dev courir, il a perdu une chaussure.',
+  'Coop coop ! Le Lead Dev cherche son badge depuis 10 minutes.',
+  'Le pigeon rapporte que le Lead Dev a oublie son cafe a la machine.',
+]
+
+function CarrierPigeon({ rounds }) {
+  const [msg] = useMemo(() => {
+    const dateStr = new Date().toDateString()
+    const idx = dateStr.length % PIGEON_MESSAGES.length
+    return [PIGEON_MESSAGES[idx]]
+  }, [])
+
+  return (
+    <div className="fun-card pigeon-card">
+      <div className="fun-card-title">🐦 Pigeon Voyageur</div>
+      <div className="fun-card-value">🐣</div>
+      <div className="fun-card-muted">{msg}</div>
+    </div>
+  )
+}
+
+// === Dungeon of Shame ===
+function DungeonOfShame({ rounds }) {
+  const worstBet = useMemo(() => {
+    const closed = rounds.filter((r) => r.status === 'closed' && r.actualValue !== null && r.bets.length > 0)
+    if (closed.length === 0) return null
+    let worst = null
+    let worstDiff = -1
+    closed.forEach((r) => {
+      r.bets.forEach((b) => {
+        const diff = Math.abs(b.value - r.actualValue)
+        if (diff > worstDiff) {
+          worstDiff = diff
+          worst = { name: b.name, avatar: b.avatar, diff: Math.round(diff) }
+        }
+      })
+    })
+    return worst
+  }, [rounds])
+
+  if (!worstBet) return null
+
+  return (
+    <div className="fun-card dungeon-card">
+      <div className="fun-card-title">🏰 Donjon de la Honte</div>
+      <div className="fun-card-value">{worstBet.avatar} {worstBet.name}</div>
+      <div className="fun-card-muted">Descend temporairement au donjon avec {worstBet.diff} min d'écart.</div>
+    </div>
+  )
+}
+
+// === Medieval Houses ===
+const HOUSES = [
+  { name: 'Maison du Crépuscule', icon: '🌙' },
+  { name: 'Maison du Fort', icon: '🏰' },
+  { name: 'Maison du Dragon', icon: '🐉' },
+  { name: 'Maison de la Taverne', icon: '🍺' },
+]
+
+function getPlayerHouse(name) {
+  if (!name) return HOUSES[0]
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0
+  }
+  return HOUSES[Math.abs(hash) % HOUSES.length]
+}
+
+// === Excuse Market ===
+const EXCUSES_SMALL = [
+  'Le cafe etait trop chaud',
+  'Le bus etait en avance',
+  "J'ai retrouve mon badge sous le canape",
+]
+const EXCUSES_MEDIUM = [
+  "Le reveil n'a pas sonne",
+  'Le chat a eteint mon reveil',
+  "Le bus n'est jamais passe",
+]
+const EXCUSES_LARGE = [
+  'Le dragon du peripherique a attaque',
+  "Un chevalier m'a defie en duel sur le chemin",
+  'Le pont-levis etait leve',
+]
+
+function ExcuseMarket({ rounds }) {
+  const lastClosed = useMemo(() => {
+    const closed = rounds.filter((r) => r.status === 'closed' && r.actualValue !== null)
+    if (closed.length === 0) return null
+    return closed.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt))[0]
+  }, [rounds])
+
+  const excuses = useMemo(() => {
+    if (!lastClosed) return []
+    const delay = computeDelayMinutes(lastClosed.actualValue)
+    if (delay === null) return []
+    let pool
+    if (delay <= 15) pool = EXCUSES_SMALL
+    else if (delay <= 45) pool = EXCUSES_MEDIUM
+    else pool = EXCUSES_LARGE
+    const dateStr = new Date(lastClosed.closedAt).toDateString()
+    return [pool[dateStr.length % pool.length], pool[(dateStr.length + 1) % pool.length], pool[(dateStr.length + 2) % pool.length]]
+  }, [lastClosed])
+
+  if (excuses.length === 0) return null
+
+  return (
+    <div className="fun-card">
+      <div className="fun-card-title">🖤 Marché Noir des Excuses</div>
+      <div className="fun-card-muted">
+        {excuses.map((e, i) => (
+          <div key={i} className="excuse-item">— {e}</div>
+        ))}
       </div>
     </div>
   )

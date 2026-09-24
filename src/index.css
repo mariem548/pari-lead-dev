@@ -1809,6 +1809,75 @@ input::placeholder {
   color: var(--color-text-muted);
 }
 
+/* === Fun Cards Grid === */
+.kingdom-fun-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+@media (max-width: 640px) {
+  .kingdom-fun-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fun-card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fun-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.fun-card-value {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-gold);
+  font-family: var(--font-display);
+}
+
+.fun-card-muted {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.wanted-card {
+  border-color: rgba(180, 80, 80, 0.4);
+  background: linear-gradient(135deg, var(--color-surface), rgba(180, 80, 80, 0.05));
+}
+
+.pigeon-card {
+  border-color: rgba(100, 150, 200, 0.4);
+}
+
+.dungeon-card {
+  border-color: rgba(80, 60, 40, 0.5);
+  background: linear-gradient(135deg, var(--color-surface), rgba(60, 40, 20, 0.1));
+}
+
+.excuse-item {
+  margin-bottom: var(--space-1);
+}
+
+.leaderboard-house {
+  font-size: 0.6rem;
+  color: var(--color-text-muted);
+  font-family: 'Cinzel', serif;
+  white-space: nowrap;
+}
+
 /* === Game Rules Modal === */
 .rules-modal {
   max-width: 600px;

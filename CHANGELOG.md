@@ -6,6 +6,17 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [3.4.0] - 2026-09-25
+
+### Added — 7 fonctionnalités medievales drole
+- Tribunal Royal du Retard : verdict automatique selon le retard (acquitté, rappel, coupable, aggravantes)
+- Avis de Recherche : affiche medievale du Lead Dev avec lieux et descriptions droles
+- Taxe Feodale du Retard : pieces fictives prelevees selon le retard (retard x 2)
+- Pigeon Voyageur : message quotidien absurde envoye par un pigeon
+- Donjon de la Honte : le pire pari du jour descend au donjon
+- Blasons de Maisons : chaque joueur rejoint une maison (Crepuscule, Fort, Dragon, Taverne)
+- Marche Noir des Excuses : liste d'excuses probables du Lead Dev selon le retard
+
 ## [3.3.0] - 2026-09-25
 
 ### Added

@@ -614,11 +614,10 @@ function parseNumberLocal(input) {
 // === New Round Form ===
 function NewRoundForm({ onCreate }) {
   const [name, setName] = useState('')
-  const [type, setType] = useState('time')
   const [expanded, setExpanded] = useState(false)
 
   function handleSubmit() {
-    onCreate(name, type)
+    onCreate(name, 'time')
     setName('')
     setExpanded(false)
   }
@@ -638,17 +637,11 @@ function NewRoundForm({ onCreate }) {
           <label>Nom du pari</label>
           <input
             type="text"
-            placeholder={type === 'time' ? 'Arrivée du lead dev' : 'Température de demain'}
+            placeholder="Arrivée du lead dev"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           />
-        </div>
-        <div className="form-group">
-          <label>Type</label>
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="time">Heure</option>
-            <option value="number">Nombre</option>
-          </select>
         </div>
         <div className="flex-gap-2">
           <button className="btn btn-primary" onClick={handleSubmit}>
@@ -658,11 +651,9 @@ function NewRoundForm({ onCreate }) {
             Annuler
           </button>
         </div>
-        {type === 'time' && (
-          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
-            Format heure : 9.30 = 9h30, 9.3 = 9h30, 9:30 = 9h30, 10 = 10h00
-          </p>
-        )}
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+          Format heure : 9.30 = 9h30, 9.3 = 9h30, 9:30 = 9h30, 10 = 10h00
+        </p>
       </div>
     </div>
   )
@@ -679,45 +670,41 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
 
   function handleAddBet() {
     if (!betValue.trim()) return
-    const value = round.type === 'time' ? parseTimeLocal(betValue) : parseNumberLocal(betValue)
+    const value = parseTimeLocal(betValue)
     if (value === null) {
-      setError(round.type === 'time' ? 'Format invalide. Ex: 9.30, 9:30, 10h00' : 'Nombre invalide')
+      setError('Format invalide. Ex: 9.30, 9:30, 10h00')
       return
     }
     setError('')
-    onAddBet(round.id, userName, betValue, round.type, userAvatar)
+    onAddBet(round.id, userName, betValue, 'time', userAvatar)
     setBetValue('')
   }
 
   function handleClose() {
     if (!actualInput.trim()) return
-    const value = round.type === 'time' ? parseTimeLocal(actualInput) : parseNumberLocal(actualInput)
+    const value = parseTimeLocal(actualInput)
     if (value === null) {
-      setError(round.type === 'time' ? 'Format invalide' : 'Nombre invalide')
+      setError('Format invalide')
       return
     }
     setError('')
-    onClose(round.id, actualInput, round.type)
+    onClose(round.id, actualInput, 'time')
   }
 
   // Sort bets by value for display
   const sortedBets = [...round.bets].sort((a, b) => a.value - b.value)
 
   function formatValue(v) {
-    if (round.type === 'time') return formatTime(v)
-    return String(v).replace('.', ',')
+    return formatTime(v)
   }
 
   function formatDiff(bet) {
     if (round.actualValue === null || round.actualValue === undefined) return ''
     const diff = Math.abs(bet.value - round.actualValue)
-    if (round.type === 'time') {
-      const mins = Math.round(diff)
-      if (mins < 1) return 'pile !'
-      if (mins === 1) return 'à 1 min'
-      return `à ${mins} min`
-    }
-    return `écart ${diff.toFixed(2).replace('.', ',')}`
+    const mins = Math.round(diff)
+    if (mins < 1) return 'pile !'
+    if (mins === 1) return 'à 1 min'
+    return `à ${mins} min`
   }
 
   return (
@@ -727,7 +714,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
         <div>
           <div className="card-title">{round.name}</div>
           <div className="card-subtitle">
-            {round.type === 'time' ? 'Pari sur une heure' : 'Pari sur un nombre'} — {round.bets.length} participant{round.bets.length > 1 ? 's' : ''}{round.createdAt ? ` — ${formatDate(round.createdAt)}` : ''}
+            Pari sur l'arrivée du Lead Dev — {round.bets.length} participant{round.bets.length > 1 ? 's' : ''}{round.createdAt ? ` — ${formatDate(round.createdAt)}` : ''}
           </div>
         </div>
         <span className={`badge ${isOpen ? 'badge-open' : 'badge-closed'}`}>
@@ -786,7 +773,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
             </div>
             <input
               type="text"
-              placeholder={round.type === 'time' ? '9.30' : '42'}
+              placeholder="9.30"
               value={betValue}
               onChange={(e) => setBetValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddBet()}
@@ -808,11 +795,11 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
         <div className="close-round">
           <div className="form-group">
             <label>
-              {round.type === 'time' ? "Heure d'arrivée réelle" : 'Résultat réel'}
+              Heure d'arrivée réelle
             </label>
             <input
               type="text"
-              placeholder={round.type === 'time' ? '10.00' : '42'}
+              placeholder="10.00"
               value={actualInput}
               onChange={(e) => setActualInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleClose()}
@@ -828,7 +815,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
       {!isOpen && round.actualValue !== null && (
         <div className="result-box">
           <div className="result-box-title">
-            {round.type === 'time' ? "Heure d'arrivée" : 'Résultat'}
+            Heure d'arrivée
           </div>
           <div className="result-value">{formatValue(round.actualValue)}</div>
           {winners.length > 0 && (
@@ -903,7 +890,7 @@ function DistributionChart({ round }) {
                     style={{ width: `${pct}%` }}
                   />
                   <span className="dist-bar-value">
-                    {round.type === 'time' ? formatTime(bet.value) : bet.value}
+                    {formatTime(bet.value)}
                   </span>
                 </div>
               </div>
@@ -911,7 +898,7 @@ function DistributionChart({ round }) {
           })}
           {round.actualValue !== null && round.actualValue !== undefined && (
             <div className="dist-actual">
-              🎯 Résultat : {round.type === 'time' ? formatTime(round.actualValue) : round.actualValue}
+              🎯 Résultat : {formatTime(round.actualValue)}
             </div>
           )}
         </div>
@@ -985,10 +972,10 @@ function HallOfFameModal({ rounds, onClose }) {
                 <div className="hof-info">
                   <span className="hof-name">{entry.name}</span>
                   <span className="hof-detail">
-                    {entry.type === 'time' ? formatTime(entry.value) : entry.value}
+                    {formatTime(entry.value)}
                     {' → '}
-                    {entry.type === 'time' ? formatTime(entry.actualValue) : entry.actualValue}
-                    {' ('}écart: {entry.diff}{entry.type === 'time' ? ' min' : ''}{')'}
+                    {formatTime(entry.actualValue)}
+                    {' ('}écart: {entry.diff} min{')'}
                   </span>
                   <span className="hof-round">{entry.roundName}</span>
                 </div>

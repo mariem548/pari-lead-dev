@@ -6,6 +6,14 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [3.1.0] - 2026-09-25
+
+### Changed
+- Suppression du choix "heure/nombre" : tous les paris sont maintenant sur l'heure d'arrivée
+- Saisie simplifiée : format direct (9.30, 9:30, 10h00), plus de sélecteur de type
+- Profil (avatar + pseudo) toujours utilisé depuis l'onboarding, plus de saisie manuelle
+- Labels et placeholders simplifiés ("Heure d'arrivée" partout)
+
 ## [3.0.0] - 2026-09-25
 
 ### Added — 12 nouvelles fonctionnalités médiévales

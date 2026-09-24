@@ -128,6 +128,13 @@ export default function App() {
   const [showHallOfFame, setShowHallOfFame] = useState(false)
   const [confetti, setConfetti] = useState(false)
   const [toasts, setToasts] = useState([])
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try {
+      return !sessionStorage.getItem('pari-lead-dev-user') || !sessionStorage.getItem(AVATAR_KEY)
+    } catch {
+      return true
+    }
+  })
 
   const showToast = useCallback((message, type = 'info') => {
     const id = Date.now() + Math.random()
@@ -321,6 +328,24 @@ export default function App() {
     <div className="app">
       {/* Knight rider animation */}
       <KnightRider />
+
+      {/* Onboarding modal */}
+      {showOnboarding && (
+        <OnboardingModal
+          userName={userName}
+          userAvatar={userAvatar}
+          onSave={(name, avatar) => {
+            setUserName(name)
+            setUserAvatar(avatar)
+            try {
+              sessionStorage.setItem('pari-lead-dev-user', name)
+              sessionStorage.setItem(AVATAR_KEY, avatar)
+            } catch {}
+            setShowOnboarding(false)
+          }}
+          onClose={() => setShowOnboarding(false)}
+        />
+      )}
 
       {/* Header */}
       <header className="header">
@@ -679,25 +704,16 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
       {isOpen && (
         <>
           <div className="add-bet-form">
-            <div className="avatar-picker">
-              {AVATARS.map((a) => (
-                <button
-                  key={a.emoji}
-                  className={`avatar-btn ${userAvatar === a.emoji ? 'selected' : ''}`}
-                  onClick={() => setUserAvatar(a.emoji)}
-                  title={a.name}
-                >
-                  {a.emoji}
-                </button>
-              ))}
+            <div className="bet-form-profile">
+              <span className="bet-form-avatar">{userAvatar || '🛡️'}</span>
+              <input
+                type="text"
+                placeholder="Prénom"
+                value={betName}
+                onChange={(e) => setBetName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddBet()}
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Prénom"
-              value={betName}
-              onChange={(e) => setBetName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddBet()}
-            />
             <input
               type="text"
               placeholder={round.type === 'time' ? '9.30' : '42'}
@@ -1028,6 +1044,52 @@ function ConfettiOverlay() {
           {p.emoji}
         </span>
       ))}
+    </div>
+  )
+}
+
+// === Onboarding Modal ===
+function OnboardingModal({ userName, userAvatar, onSave, onClose }) {
+  const [name, setName] = useState(userName || '')
+  const [avatar, setAvatar] = useState(userAvatar || AVATARS[0].emoji)
+
+  function handleSave() {
+    if (!name.trim()) return
+    onSave(name.trim(), avatar)
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal onboarding-modal" onClick={(e) => e.stopPropagation()}>
+        <h2>🏰 Bienvenue au royaume</h2>
+        <p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer à parier</p>
+        <div className="onboarding-avatar-grid">
+          {AVATARS.map((a) => (
+            <button
+              key={a.emoji}
+              className={`onboarding-avatar-btn ${avatar === a.emoji ? 'selected' : ''}`}
+              onClick={() => setAvatar(a.emoji)}
+              title={a.name}
+            >
+              <span className="onboarding-avatar-emoji">{a.emoji}</span>
+              <span className="onboarding-avatar-name">{a.name}</span>
+            </button>
+          ))}
+        </div>
+        <div className="onboarding-name-section">
+          <input
+            type="text"
+            placeholder="Ton prénom"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+            autoFocus
+          />
+          <button className="btn btn-primary" onClick={handleSave} disabled={!name.trim()}>
+            ⚔️ Commencer
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

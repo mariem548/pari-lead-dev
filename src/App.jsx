@@ -55,6 +55,27 @@ function StoryPopup({ open, onClose }) {
   )
 }
 
+// === Logo SVG ===
+function Logo() {
+  return (
+    <svg className="logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Pari Lead Dev">
+      <rect x="20" y="34" width="24" height="22" rx="2" fill="var(--color-primary)" />
+      <rect x="16" y="28" width="8" height="28" rx="1.5" fill="var(--color-primary-hover)" />
+      <rect x="40" y="28" width="8" height="28" rx="1.5" fill="var(--color-primary-hover)" />
+      <rect x="16" y="25" width="3" height="4" fill="var(--color-primary-hover)" />
+      <rect x="21" y="25" width="3" height="4" fill="var(--color-primary-hover)" />
+      <rect x="40" y="25" width="3" height="4" fill="var(--color-primary-hover)" />
+      <rect x="45" y="25" width="3" height="4" fill="var(--color-primary-hover)" />
+      <path d="M28 48 Q28 42 32 42 Q36 42 36 48 L36 56 L28 56 Z" fill="var(--color-bg)" />
+      <text x="32" y="41" textAnchor="middle" fontSize="8" fontWeight="700" fill="var(--color-bg)" fontFamily="Cinzel, serif">GIT</text>
+      <path d="M22 20 Q22 10 32 10 Q42 10 42 20 L42 24 L38 24 L38 20 Q38 14 32 14 Q26 14 26 20 L26 24 L22 24 Z" fill="var(--color-gold)" />
+      <rect x="28" y="17" width="8" height="1.5" rx="0.5" fill="var(--color-bg)" />
+      <path d="M32 10 Q34 6 38 4 Q36 8 34 10" fill="var(--color-error)" />
+      <path d="M12 34 L32 62 L52 34 Z" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" opacity="0.4" />
+    </svg>
+  )
+}
+
 // === Theme ===
 function useTheme() {
   const [theme, setTheme] = useState(() => {

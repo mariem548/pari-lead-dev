@@ -6,6 +6,13 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [2.6.0] - 2026-09-25
+
+### Added
+- Carte du royaume agrandie (320px de haut, avatars plus grands)
+- Badge de notification sur le Parchemin Royal quand le rapport mensuel est prêt
+- Animation pulse sur le badge pour attirer l'attention
+
 ## [2.5.0] - 2026-09-25
 
 ### Added

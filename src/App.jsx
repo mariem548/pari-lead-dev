@@ -1123,8 +1123,28 @@ function ConfettiOverlay() {
 // === Monthly Recap (Parchemin Royal) ===
 function MonthlyRecap({ rounds }) {
   const [show, setShow] = useState(false)
+  const [recapSeen, setRecapSeen] = useState(() => {
+    try {
+      const month = new Date().getMonth()
+      return sessionStorage.getItem('pari-lead-dev-recap-seen') === String(month)
+    } catch {
+      return false
+    }
+  })
 
   const recap = useMemo(() => api.computeMonthlyRecap(rounds), [rounds])
+
+  // Show toast when recap becomes available and hasn't been seen
+  useEffect(() => {
+    if (recap && !recapSeen) {
+      const month = new Date().getMonth()
+      try {
+        sessionStorage.setItem('pari-lead-dev-recap-seen', String(month))
+      } catch {}
+      setRecapSeen(true)
+    }
+  }, [recap, recapSeen])
+
   if (!recap) return null
 
   const monthName = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
@@ -1148,6 +1168,7 @@ function MonthlyRecap({ rounds }) {
     <>
       <button className="btn btn-secondary monthly-recap-btn" onClick={() => setShow(true)}>
         📜 Parchemin Royal du Mois
+        {!recapSeen && <span className="recap-badge">!</span>}
       </button>
       {show && (
         <div className="modal-overlay" onClick={() => setShow(false)}>

@@ -59,35 +59,50 @@ function StoryPopup({ open, onClose }) {
 function Logo() {
   return (
     <svg className="logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Pari Lead Dev">
-      {/* Shield/kingdom base */}
-      <path d="M10 28 L32 60 L54 28 Z" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" opacity="0.3" />
-      {/* Castle */}
-      <rect x="18" y="36" width="28" height="22" rx="1" fill="var(--color-primary)" />
-      <rect x="14" y="30" width="8" height="28" rx="1" fill="var(--color-primary-hover)" />
-      <rect x="42" y="30" width="8" height="28" rx="1" fill="var(--color-primary-hover)" />
+      {/* Background arch (mustard) */}
+      <path d="M8 56 L8 20 Q8 8 32 8 Q56 8 56 20 L56 56 Z" fill="#e8b84b" opacity="0.25" />
+      {/* Castle towers */}
+      <rect x="20" y="34" width="24" height="22" fill="#3a3a4a" />
+      <rect x="14" y="26" width="9" height="30" fill="#4a4a5a" />
+      <rect x="41" y="26" width="9" height="30" fill="#4a4a5a" />
+      {/* Tower cone roofs (red) */}
+      <polygon points="14,26 18.5,18 23,26" fill="#c8443a" />
+      <polygon points="41,26 45.5,18 50,26" fill="#c8443a" />
+      <polygon points="20,34 32,22 44,34" fill="#c8443a" />
       {/* Crenellations */}
-      <rect x="14" y="27" width="2.5" height="4" fill="var(--color-primary-hover)" />
-      <rect x="18" y="27" width="2.5" height="4" fill="var(--color-primary-hover)" />
-      <rect x="42" y="27" width="2.5" height="4" fill="var(--color-primary-hover)" />
-      <rect x="46" y="27" width="2.5" height="4" fill="var(--color-primary-hover)" />
-      {/* Door */}
-      <path d="M27 50 Q27 44 32 44 Q37 44 37 50 L37 58 L27 58 Z" fill="var(--color-bg)" />
-      {/* GIT text on castle */}
-      <text x="32" y="41" textAnchor="middle" fontSize="7" fontWeight="700" fill="var(--color-bg)" fontFamily="Cinzel, serif" letterSpacing="0.5">GIT</text>
-      {/* Crossed swords behind guardian */}
-      <line x1="16" y1="54" x2="48" y2="14" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" />
-      <line x1="48" y1="54" x2="16" y2="14" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" />
-      {/* Sword guards */}
-      <line x1="14" y1="52" x2="19" y2="56" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="50" y1="52" x2="45" y2="56" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" />
-      {/* Guardian person in front of castle */}
-      {/* Head */}
-      <circle cx="32" cy="22" r="5" fill="var(--color-gold)" />
-      {/* Body/armor */}
-      <path d="M26 28 Q26 44 32 48 Q38 44 38 28 Z" fill="var(--color-gold)" />
-      {/* Arms crossed (guardian pose) */}
-      <path d="M26 30 L38 36" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M38 30 L26 36" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" />
+      <rect x="14" y="23" width="2" height="4" fill="#4a4a5a" />
+      <rect x="18" y="23" width="2" height="4" fill="#4a4a5a" />
+      <rect x="41" y="23" width="2" height="4" fill="#4a4a5a" />
+      <rect x="45" y="23" width="2" height="4" fill="#4a4a5a" />
+      {/* Windows (black slits) */}
+      <rect x="16" y="32" width="1.5" height="6" fill="#1a1a2a" />
+      <rect x="46" y="32" width="1.5" height="6" fill="#1a1a2a" />
+      {/* Castle door */}
+      <path d="M27 50 Q27 44 32 44 Q37 44 37 50 L37 56 L27 56 Z" fill="#1a1a2a" />
+      {/* GIT text on castle wall */}
+      <text x="32" y="40" textAnchor="middle" fontSize="8" fontWeight="700" fill="#e8b84b" fontFamily="Cinzel, serif" letterSpacing="0.5">GIT</text>
+      {/* Knight on horse (left foreground) */}
+      {/* Horse body */}
+      <path d="M8 52 Q8 48 14 47 L22 47 Q26 47 28 50 L28 53 Q28 55 26 55 L24 55 L24 56 L22 56 L22 55 L14 55 Q8 55 8 52 Z" fill="#2a2a3a" />
+      {/* Horse legs */}
+      <rect x="11" y="53" width="2" height="5" fill="#2a2a3a" />
+      <rect x="24" y="53" width="2" height="5" fill="#2a2a3a" />
+      {/* Horse head */}
+      <path d="M6 49 Q4 46 6 44 L10 44 Q12 46 11 49 L9 51 Q7 51 6 49 Z" fill="#2a2a3a" />
+      {/* Knight body (armor) */}
+      <path d="M16 42 Q14 46 16 50 L22 50 Q24 46 22 42 Z" fill="#c8a032" />
+      {/* Knight head with crown */}
+      <circle cx="19" cy="39" r="3.5" fill="#d4a04a" />
+      {/* Crown */}
+      <polygon points="16,36 17.5,33 19,35 20.5,33 22,36" fill="#e8b84b" />
+      {/* Cape (red) */}
+      <path d="M16 42 L13 50 L16 50 Z" fill="#c8443a" />
+      <path d="M22 42 L25 50 L22 50 Z" fill="#c8443a" />
+      {/* Polearm/spear */}
+      <line x1="24" y1="50" x2="27" y2="28" stroke="#e8b84b" strokeWidth="1.5" strokeLinecap="round" />
+      <polygon points="26,28 27,24 28,28" fill="#c8443a" />
+      {/* Sun/crest on castle */}
+      <circle cx="32" cy="28" r="3" fill="#e8b84b" opacity="0.6" />
     </svg>
   )
 }
@@ -133,17 +148,6 @@ export default function App() {
   const [period, setPeriod] = useState('all')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [showStory, setShowStory] = useState(() => {
-    try {
-      return !sessionStorage.getItem(STORY_KEY)
-    } catch {
-      return true
-    }
-  })
-  const [profilePlayer, setProfilePlayer] = useState(null)
-  const [showHallOfFame, setShowHallOfFame] = useState(false)
-  const [confetti, setConfetti] = useState(false)
-  const [toasts, setToasts] = useState([])
   const [showOnboarding, setShowOnboarding] = useState(() => {
     try {
       return !sessionStorage.getItem('pari-lead-dev-user') || !sessionStorage.getItem(AVATAR_KEY)
@@ -151,6 +155,12 @@ export default function App() {
       return true
     }
   })
+  // Story popup shows AFTER onboarding (mandatory read)
+  const [showStory, setShowStory] = useState(false)
+  const [profilePlayer, setProfilePlayer] = useState(null)
+  const [showHallOfFame, setShowHallOfFame] = useState(false)
+  const [confetti, setConfetti] = useState(false)
+  const [toasts, setToasts] = useState([])
 
   const showToast = useCallback((message, type = 'info') => {
     const id = Date.now() + Math.random()
@@ -358,6 +368,11 @@ export default function App() {
               sessionStorage.setItem(AVATAR_KEY, avatar)
             } catch {}
             setShowOnboarding(false)
+            // Show mandatory story popup after onboarding
+            const storySeen = sessionStorage.getItem(STORY_KEY)
+            if (!storySeen) {
+              setShowStory(true)
+            }
           }}
           onClose={() => setShowOnboarding(false)}
         />
@@ -372,12 +387,20 @@ export default function App() {
             <p>Paris d'équipe {isSupabaseConfigured ? '— partagé' : ''}</p>
           </div>
         </div>
-        <button className="theme-toggle" onClick={toggle} aria-label="Changer de thème">
-          {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-        </button>
-        <button className="story-toggle" onClick={() => setShowStory(true)} aria-label="Notre histoire">
-          📜
-        </button>
+        <div className="header-right">
+          {userName && (
+            <button className="profile-switch-btn" onClick={() => setShowOnboarding(true)} aria-label="Changer de profil" title="Changer de profil">
+              <span className="profile-switch-avatar">{userAvatar || '🛡️'}</span>
+              <span className="profile-switch-name">{userName}</span>
+            </button>
+          )}
+          <button className="theme-toggle" onClick={toggle} aria-label="Changer de thème">
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <button className="story-toggle" onClick={() => setShowStory(true)} aria-label="Notre histoire">
+            📜
+          </button>
+        </div>
       </header>
 
       {/* Setup banner */}

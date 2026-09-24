@@ -9,7 +9,12 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 ## [Unreleased]
 
 ### Added
-- Configuration Supabase pour le mode partagé
+- Mot de passe d'équipe pour protéger les écritures (créer/modifier/supprimer)
+- Fonction RPC `verify_team_password` côté Supabase (hash bcrypt)
+- Bouton verrouiller/déverrouiller dans le header
+- Pop-up de connexion avec mot de passe
+- Colonne `created_by` pour tracer qui a fait quel pari
+- Table `app_config` sécurisée (RLS bloque l'accès direct)
 
 ### Fixed
 - Les nouveaux paris ne s'affichaient pas en mode partagé (Supabase) — mise à jour de l'état local systématique après chaque action

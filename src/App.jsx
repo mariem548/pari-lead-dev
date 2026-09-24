@@ -9,6 +9,44 @@ import {
   formatTime,
 } from './lib/api'
 
+// === Password gate ===
+const PASSWORD_KEY = 'pari-lead-dev-unlocked'
+const USER_KEY = 'pari-lead-dev-user'
+
+function PasswordGate({ open, onClose, onUnlock, error }) {
+  const [password, setPassword] = useState('')
+  if (!open) return null
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content modal-sm" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fermer">✕</button>
+        <div className="gate-icon">🔐</div>
+        <h2 className="gate-title">Accès au royaume</h2>
+        <p className="gate-subtitle">Entrez le mot de passe de l'équipe pour parier</p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onUnlock(password)
+          }}
+        >
+          <input
+            type="password"
+            className="gate-input"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoFocus
+          />
+          {error && <div className="gate-error">{error}</div>}
+          <button type="submit" className="btn btn-primary modal-btn">
+            Déverrouiller 🔓
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // === Story popup ===
 const STORY_KEY = 'pari-lead-dev-story-seen'
 
@@ -84,6 +122,22 @@ export default function App() {
       return true
     }
   })
+  const [unlocked, setUnlocked] = useState(() => {
+    try {
+      return sessionStorage.getItem('pari-lead-dev-unlocked') === '1'
+    } catch {
+      return false
+    }
+  })
+  const [showPasswordGate, setShowPasswordGate] = useState(false)
+  const [passwordError, setPasswordError] = useState('')
+  const [userName, setUserName] = useState(() => {
+    try {
+      return sessionStorage.getItem('pari-lead-dev-user') || ''
+    } catch {
+      return ''
+    }
+  })
 
   function closeStory() {
     setShowStory(false)
@@ -92,6 +146,43 @@ export default function App() {
     } catch {
       // sessionStorage blocked
     }
+  }
+
+  async function tryUnlock(password) {
+    setPasswordError('')
+    try {
+      const ok = await api.verifyPassword(password)
+      if (ok) {
+        setUnlocked(true)
+        setShowPasswordGate(false)
+        try {
+          sessionStorage.setItem('pari-lead-dev-unlocked', '1')
+        } catch {
+          // blocked
+        }
+      } else {
+        setPasswordError('Mot de passe incorrect')
+      }
+    } catch (e) {
+      setPasswordError('Erreur: ' + e.message)
+    }
+  }
+
+  function lock() {
+    setUnlocked(false)
+    try {
+      sessionStorage.removeItem('pari-lead-dev-unlocked')
+    } catch {
+      // blocked
+    }
+  }
+
+  function requireUnlock() {
+    if (!unlocked) {
+      setShowPasswordGate(true)
+      return false
+    }
+    return true
   }
 
   // Load data
@@ -127,6 +218,7 @@ export default function App() {
 
   // --- Actions ---
   async function createRound(name, type) {
+    if (!requireUnlock()) return
     try {
       const round = await api.createRound(name, type)
       // Always update local state immediately
@@ -137,8 +229,9 @@ export default function App() {
   }
 
   async function addBet(roundId, name, valueStr, type) {
+    if (!requireUnlock()) return
     try {
-      const bet = await api.addBet(roundId, name, valueStr, type)
+      const bet = await api.addBet(roundId, name, valueStr, type, userName || null)
       if (bet) {
         setRounds((prev) =>
           prev.map((r) =>
@@ -155,6 +248,7 @@ export default function App() {
   }
 
   async function removeBet(roundId, betId) {
+    if (!requireUnlock()) return
     try {
       await api.removeBet(roundId, betId)
       setRounds((prev) =>
@@ -168,6 +262,7 @@ export default function App() {
   }
 
   async function closeRound(roundId, actualInput, type) {
+    if (!requireUnlock()) return
     try {
       await api.closeRound(roundId, actualInput, type)
       setRounds((prev) =>
@@ -184,6 +279,7 @@ export default function App() {
   }
 
   async function reopenRound(roundId) {
+    if (!requireUnlock()) return
     try {
       await api.reopenRound(roundId)
       setRounds((prev) =>
@@ -199,6 +295,7 @@ export default function App() {
   }
 
   async function deleteRound(roundId) {
+    if (!requireUnlock()) return
     if (!confirm('Supprimer ce pari ? Les scores seront recalculés.')) return
     try {
       await api.deleteRound(roundId)
@@ -209,6 +306,7 @@ export default function App() {
   }
 
   async function resetAll() {
+    if (!requireUnlock()) return
     if (!confirm('Tout effacer ? Tous les paris et scores seront perdus.')) return
     try {
       await api.resetAll()
@@ -257,6 +355,14 @@ export default function App() {
         <button className="story-toggle" onClick={() => setShowStory(true)} aria-label="Notre histoire">
           📜
         </button>
+        <button
+          className={`lock-toggle ${unlocked ? 'locked' : ''}`}
+          onClick={() => (unlocked ? lock() : setShowPasswordGate(true))}
+          aria-label={unlocked ? 'Verrouiller' : 'Déverrouiller'}
+          title={unlocked ? 'Verrouiller' : 'Déverrouiller'}
+        >
+          {unlocked ? '🔒' : '🔓'}
+        </button>
       </header>
 
       {/* Setup banner */}
@@ -269,6 +375,14 @@ export default function App() {
 
       {/* Story popup */}
       <StoryPopup open={showStory} onClose={closeStory} />
+
+      {/* Password gate */}
+      <PasswordGate
+        open={showPasswordGate}
+        onClose={() => { setShowPasswordGate(false); setPasswordError('') }}
+        onUnlock={tryUnlock}
+        error={passwordError}
+      />
 
       {/* Error */}
       {error && (

@@ -132,6 +132,7 @@ function mapRound(row) {
       id: b.id,
       name: b.name,
       value: Number(b.value),
+      createdBy: b.created_by || null,
     })),
     actualValue: row.actual_value !== null ? Number(row.actual_value) : null,
     actualInput: row.actual_input || '',
@@ -169,7 +170,7 @@ async function createRoundSupabase(name, type) {
   return mapRound(data)
 }
 
-async function addBetSupabase(roundId, name, valueStr, type) {
+async function addBetSupabase(roundId, name, valueStr, type, createdBy) {
   const value = type === 'time' ? parseTime(valueStr) : parseNumber(valueStr)
   if (value === null) throw new Error('Invalid value')
 
@@ -180,12 +181,13 @@ async function addBetSupabase(roundId, name, valueStr, type) {
       round_id: roundId,
       name: name.trim(),
       value: value,
+      created_by: createdBy || null,
     })
     .select()
     .single()
 
   if (error) throw error
-  return { id: data.id, name: data.name, value: Number(data.value) }
+  return { id: data.id, name: data.name, value: Number(data.value), createdBy: data.created_by }
 }
 
 async function removeBetSupabase(roundId, betId) {
@@ -276,9 +278,9 @@ export const api = {
     return round
   },
 
-  async addBet(roundId, name, valueStr, type) {
+  async addBet(roundId, name, valueStr, type, createdBy) {
     if (isSupabaseConfigured) {
-      return addBetSupabase(roundId, name, valueStr, type)
+      return addBetSupabase(roundId, name, valueStr, type, createdBy)
     }
     // localStorage
     const data = loadLocal()
@@ -286,7 +288,7 @@ export const api = {
     if (!round) return null
     const value = type === 'time' ? parseTime(valueStr) : parseNumber(valueStr)
     if (value === null) return null
-    const bet = { id: genId(), name: name.trim(), value }
+    const bet = { id: genId(), name: name.trim(), value, createdBy: createdBy || null }
     round.bets.push(bet)
     saveLocal(data)
     return bet
@@ -353,6 +355,13 @@ export const api = {
       return
     }
     saveLocal({ rounds: [] })
+  },
+
+  async verifyPassword(password) {
+    if (!isSupabaseConfigured) return true
+    const { data, error } = await supabase.rpc('verify_team_password', { input: password })
+    if (error) throw error
+    return data === true
   },
 
   subscribe(callback) {

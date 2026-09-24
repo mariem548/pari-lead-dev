@@ -150,6 +150,81 @@ a, button, input, select {
   }
 }
 
+/* === Password gate === */
+.lock-toggle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.lock-toggle:hover {
+  border-color: var(--color-gold);
+}
+
+.lock-toggle.locked {
+  background: var(--color-gold-highlight);
+  border-color: var(--color-gold);
+}
+
+.modal-sm {
+  max-width: 380px;
+}
+
+.gate-icon {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: var(--space-2);
+}
+
+.gate-title {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+  letter-spacing: 0.02em;
+}
+
+.gate-subtitle {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+}
+
+.gate-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.gate-input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-gold-highlight);
+}
+
+.gate-error {
+  color: var(--color-error);
+  font-size: var(--text-xs);
+  text-align: center;
+  margin-top: var(--space-2);
+}
+
 /* === Story popup === */
 .story-toggle {
   width: 40px;

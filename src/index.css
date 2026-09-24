@@ -1019,6 +1019,130 @@ input::placeholder {
   max-width: 100px !important;
 }
 
+/* === Arrow animation === */
+.arrow-animation {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 2rem;
+  z-index: 1000;
+}
+
+.arrow-emoji {
+  animation: arrow-shoot 0.6s ease-out;
+}
+
+.arrow-projectile {
+  display: inline-block;
+  font-size: 1.5rem;
+  color: var(--color-gold);
+  animation: arrow-fly 0.8s ease-out;
+}
+
+.target-emoji {
+  animation: target-hit 0.8s ease-out 0.5s;
+}
+
+@keyframes arrow-shoot {
+  0% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(-10px) rotate(-15deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes arrow-fly {
+  0% { opacity: 0; transform: translateX(-40px) scale(0.5); }
+  30% { opacity: 1; }
+  70% { transform: translateX(20px) scale(1.2); }
+  100% { opacity: 0; transform: translateX(40px) scale(0.8); }
+}
+
+@keyframes target-hit {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* === Confetti === */
+.confetti-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* === Toasts === */
+.toast-container {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.toast {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  animation: toast-in 0.3s ease-out, toast-out 0.3s ease-in 3s forwards;
+  white-space: nowrap;
+}
+
+.toast-success {
+  background: linear-gradient(135deg, var(--color-gold), #ffd700);
+  color: var(--color-text);
+}
+
+.toast-info {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 /* === Modals === */
 .modal-overlay {
   position: fixed;

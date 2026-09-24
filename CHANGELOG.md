@@ -6,6 +6,14 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [2.0.0] - 2026-09-24
+
+### Added
+- Confettis médiévaux : animation de chute d'emojis (⚔️🏹🛡️👑🏰) à la fermeture d'un pari
+- Animation de flèche : arc 🏹 qui tire une flèche ➤ vers la cible 🎯
+- Effets sonores (Web Audio API) : son de pari, son de victoire, son de fermeture
+- Notifications toast : messages en bas d'écran pour pari ajouté et victoire
+
 ## [1.9.0] - 2026-09-24
 
 ### Added

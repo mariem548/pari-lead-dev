@@ -105,6 +105,19 @@ export default function App() {
   })
   const [profilePlayer, setProfilePlayer] = useState(null)
   const [showHallOfFame, setShowHallOfFame] = useState(false)
+  const [confetti, setConfetti] = useState(false)
+  const [toasts, setToasts] = useState([])
+
+  const showToast = useCallback((message, type = 'info') => {
+    const id = Date.now() + Math.random()
+    setToasts((prev) => [...prev, { id, message, type }])
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500)
+  }, [])
+
+  const triggerConfetti = useCallback(() => {
+    setConfetti(true)
+    setTimeout(() => setConfetti(false), 3000)
+  }, [])
   const [userName, setUserName] = useState(() => {
     try {
       return sessionStorage.getItem('pari-lead-dev-user') || ''
@@ -179,6 +192,8 @@ export default function App() {
             r.id === roundId ? { ...r, bets: [...r.bets, bet] } : r,
           ),
         )
+        showToast(`⚔️ ${name} a parié !`, 'info')
+        playSound('bet')
       } else {
         // Supabase: reload to get the bet with correct ID
         loadRounds()
@@ -204,14 +219,21 @@ export default function App() {
   async function closeRound(roundId, actualInput, type) {
     try {
       await api.closeRound(roundId, actualInput, type)
+      let winnerNames = []
       setRounds((prev) =>
         prev.map((r) => {
           if (r.id !== roundId) return r
           const value = type === 'time' ? parseTimeLocal(actualInput) : parseNumberLocal(actualInput)
           const winners = computeWinners({ ...r, actualValue: value })
+          winnerNames = r.bets.filter((b) => winners.includes(b.id)).map((b) => b.name)
           return { ...r, actualValue: value, actualInput, status: 'closed', winners }
         }),
       )
+      triggerConfetti()
+      playSound('win')
+      if (winnerNames.length > 0) {
+        showToast(`🏆 ${winnerNames.join(', ')} ${winnerNames.length > 1 ? 'gagnent' : 'gagne'} !`, 'success')
+      }
     } catch (e) {
       setError('Erreur: ' + e.message)
     }
@@ -313,6 +335,18 @@ export default function App() {
       {showHallOfFame && (
         <HallOfFameModal rounds={rounds} onClose={() => setShowHallOfFame(false)} />
       )}
+
+      {/* Confetti overlay */}
+      {confetti && <ConfettiOverlay />}
+
+      {/* Toast notifications */}
+      <div className="toast-container">
+        {toasts.map((t) => (
+          <div key={t.id} className={`toast toast-${t.type}`}>
+            {t.message}
+          </div>
+        ))}
+      </div>
 
       {/* Error */}
       {error && (
@@ -936,6 +970,94 @@ function HallOfFameModal({ rounds, onClose }) {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+// === Confetti Overlay ===
+const CONFETTI_EMOJIS = ['⚔️', '🏹', '🛡️', '👑', '🏰', '🔥', '🏆', '⚔️', '🗡️', '🛡️']
+
+// === Sound effects (Web Audio API) ===
+let audioCtx = null
+function getAudioCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)() } catch { return null }
+  }
+  return audioCtx
+}
+
+function playTone(freq, duration, type = 'sine', volume = 0.15) {
+  const ctx = getAudioCtx()
+  if (!ctx) return
+  const osc = ctx.createOscillator()
+  const gain = ctx.createGain()
+  osc.type = type
+  osc.frequency.value = freq
+  gain.gain.setValueAtTime(volume, ctx.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
+  osc.connect(gain)
+  gain.connect(ctx.destination)
+  osc.start(ctx.currentTime)
+  osc.stop(ctx.currentTime + duration)
+}
+
+export function playSound(name) {
+  switch (name) {
+    case 'bet':
+      playTone(523, 0.1, 'triangle')
+      setTimeout(() => playTone(659, 0.1, 'triangle'), 80)
+      break
+    case 'win':
+      playTone(523, 0.15, 'sine')
+      setTimeout(() => playTone(659, 0.15, 'sine'), 100)
+      setTimeout(() => playTone(784, 0.2, 'sine'), 200)
+      setTimeout(() => playTone(1047, 0.3, 'sine'), 300)
+      break
+    case 'close':
+      playTone(330, 0.2, 'sawtooth', 0.1)
+      setTimeout(() => playTone(440, 0.2, 'sawtooth', 0.1), 150)
+      break
+    default:
+      playTone(440, 0.1)
+  }
+}
+
+
+function ConfettiOverlay() {
+  const pieces = useMemo(() => {
+    return Array.from({ length: 40 }, (_, i) => ({
+      id: i,
+      emoji: CONFETTI_EMOJIS[i % CONFETTI_EMOJIS.length],
+      left: Math.random() * 100,
+      delay: Math.random() * 0.8,
+      duration: 2 + Math.random() * 1.5,
+      size: 1 + Math.random() * 0.8,
+      rotate: Math.random() * 360,
+    }))
+  }, [])
+
+  return (
+    <div className="confetti-overlay">
+      <div className="arrow-animation">
+        <span className="arrow-emoji">🏹</span>
+        <span className="arrow-projectile">➤</span>
+        <span className="target-emoji">🎯</span>
+      </div>
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            left: `${p.left}%`,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+            fontSize: `${p.size}rem`,
+            transform: `rotate(${p.rotate}deg)`,
+          }}
+        >
+          {p.emoji}
+        </span>
+      ))}
     </div>
   )
 }

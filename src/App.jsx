@@ -161,6 +161,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('paris')
   const [profilePlayer, setProfilePlayer] = useState(null)
   const [showHallOfFame, setShowHallOfFame] = useState(false)
+  const [showRules, setShowRules] = useState(false)
   const [confetti, setConfetti] = useState(false)
   const [toasts, setToasts] = useState([])
 
@@ -401,7 +402,10 @@ export default function App() {
           <button className="theme-toggle" onClick={toggle} aria-label="Changer de thème">
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
-          <button className="story-toggle" onClick={() => setShowStory(true)} aria-label="Notre histoire">
+          <button className="story-toggle" onClick={() => setShowStory(true)} aria-label="Notre histoire" title="Notre histoire">
+            📖
+          </button>
+          <button className="story-toggle" onClick={() => setShowRules(true)} aria-label="Règles du jeu" title="Code du Royaume">
             📜
           </button>
         </div>
@@ -427,6 +431,9 @@ export default function App() {
       {showHallOfFame && (
         <HallOfFameModal rounds={rounds} onClose={() => setShowHallOfFame(false)} />
       )}
+
+      {/* Game rules modal */}
+      <GameRulesModal open={showRules} onClose={() => setShowRules(false)} />
 
       {/* Confetti overlay */}
       {confetti && <ConfettiOverlay />}
@@ -1756,6 +1763,87 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
         <MonthlyRecap rounds={rounds} onOpenBanquet={() => setBanquetTrigger(true)} />
         <button className="btn btn-secondary hall-of-fame-btn" onClick={onOpenHallOfFame}>
           🏆 Hall of Fame
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// === Game Rules Modal (Code du Royaume) ===
+function GameRulesModal({ open, onClose }) {
+  if (!open) return null
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal rules-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <h2>📜 Code du Royaume</h2>
+        <p className="modal-subtitle">Les lois sacrées du pari royal</p>
+
+        <div className="rules-section">
+          <h3>🎯 But du jeu</h3>
+          <p>Devinez l'heure d'arrivée du Suprême Lead Dev. Celui dont la prédiction est la plus proche de l'heure réelle remporte la victoire et gagne des points de renommée.</p>
+        </div>
+
+        <div className="rules-section">
+          <h3>⚔️ Comment jouer</h3>
+          <ol className="rules-list">
+            <li><strong>Choisis ton identité</strong> : au premier lancement, choisis ton avatar et ton pseudo. Ils restent les mêmes tout au long de l'aventure.</li>
+            <li><strong>Crée un pari</strong> : clique sur « + Nouveau pari » et donne-lui un nom.</li>
+            <li><strong>Parie une heure</strong> : saisis l'heure à laquelle tu penses que le Lead Dev arrivera. Formats acceptés : <code>9.30</code>, <code>9:30</code>, <code>9h30</code>, <code>10</code>.</li>
+            <li><strong>Clôture</strong> : quand le Lead Dev arrive, saisis l'heure réelle. L'app calcule automatiquement le gagnant.</li>
+          </ol>
+        </div>
+
+        <div className="rules-section">
+          <h3>🏆 Score & points</h3>
+          <p>Le joueur dont la prédiction est la <strong>plus proche</strong> de l'heure réelle gagne <strong>1 point</strong>. En cas d'égalité parfaite, tous les ex aequo gagnent. Les points s'accumulent au fil des paris.</p>
+        </div>
+
+        <div className="rules-section">
+          <h3>👑 Titres de noblesse</h3>
+          <p>Plus tu gagnes de points, plus ton titre évolue dans le royaume :</p>
+          <table className="rules-table">
+            <thead>
+              <tr><th>Score</th><th>Titre</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>0</td><td>🧑‍🌾 Vilain du village</td></tr>
+              <tr><td>1+</td><td>🛡️ Écuyer</td></tr>
+              <tr><td>3+</td><td>⚔️ Chevalier</td></tr>
+              <tr><td>6+</td><td>🏰 Baron</td></tr>
+              <tr><td>10+</td><td>👑 Comte</td></tr>
+              <tr><td>15+</td><td>🔮 Grand Oracle</td></tr>
+              <tr><td>25+</td><td>👑 Souverain du Retard</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="rules-section">
+          <h3>🗺️ Le Royaume</h3>
+          <p>L'onglet <strong>Royaume</strong> contient tout ton aventure :</p>
+          <ul className="rules-list">
+            <li><strong>Carte du royaume</strong> : vois les joueurs avancer du Village jusqu'au Château GIT selon leur score.</li>
+            <li><strong>Météo du royaume</strong> : le temps change selon l'heure d'arrivée du Lead Dev (soleil s'il est tôt, tempête s'il est très en retard).</li>
+            <li><strong>Joutes</strong> : les deux meilleurs joueurs s'affrontent dans un duel quotidien.</li>
+            <li><strong>Quêtes du jour</strong> : complète des challenges (Oracle précis, Double couronne).</li>
+            <li><strong>Coffre aux exploits</strong> : débloque des trophées (Pile à l'heure, Prophète du café, etc.).</li>
+            <li><strong>Calendrier des retards</strong> : visualise les retards du Lead Dev sur le mois.</li>
+          </ul>
+        </div>
+
+        <div className="rules-section">
+          <h3>📜 Parchemin Royal</h3>
+          <p>À la fin du mois, le <strong>Parchemin Royal</strong> récapitule tout : l'arrivée la plus tardive, la plus tôt, le Grand Oracle du mois, la meilleure prédiction, et l'heure d'arrivée moyenne. Un badge « ! » apparaît quand le rapport est prêt. Tu peux le copier pour le partager sur Slack ou Teams.</p>
+        </div>
+
+        <div className="rules-section">
+          <h3>🎉 Banquet de fin de mois</h3>
+          <p>Quand tu ouvres le Parchemin Royal, les trompettes sonnent et le banquet commence ! Une petite célébration pour honorer les devins du royaume.</p>
+        </div>
+
+        <button className="btn btn-primary" style={{ marginTop: 'var(--space-4)', width: '100%', justifyContent: 'center' }} onClick={onClose}>
+          ⚔️ J'ai compris, que l'aventure commence !
         </button>
       </div>
     </div>

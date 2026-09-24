@@ -6,6 +6,15 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
+## [3.2.0] - 2026-09-25
+
+### Added
+- Code du Royaume : modal des règles du jeu complète (but, comment jouer, score, titres, royaume, parchemin, banquet)
+- Bouton 📜 dans le header pour consulter les règles à tout moment
+- Tableau des titres de noblesse avec paliers de score
+- Rappel du Parchemin Royal mensuel dans les règles
+- CSS dédié pour les règles (sections, tableaux, listes)
+
 ## [3.1.0] - 2026-09-25
 
 ### Changed

@@ -1802,6 +1802,85 @@ input::placeholder {
   color: var(--color-text-muted);
 }
 
+/* === Game Rules Modal === */
+.rules-modal {
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.rules-section {
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.rules-section:last-child {
+  border-bottom: none;
+}
+
+.rules-section h3 {
+  font-family: 'Cinzel', serif;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-base);
+}
+
+.rules-section p {
+  color: var(--color-text);
+  line-height: 1.6;
+  font-size: var(--text-sm);
+}
+
+.rules-list {
+  margin-left: var(--space-5);
+  margin-top: var(--space-2);
+}
+
+.rules-list li {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.rules-list code {
+  background: var(--color-surface-2);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-size: var(--text-xs);
+  border: 1px solid var(--color-border);
+}
+
+.rules-table {
+  width: 100%;
+  margin-top: var(--space-3);
+  border-collapse: collapse;
+}
+
+.rules-table th {
+  text-align: left;
+  padding: var(--space-2);
+  background: var(--color-surface-2);
+  font-family: 'Cinzel', serif;
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-gold);
+}
+
+.rules-table td {
+  padding: var(--space-2);
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.rules-table td:first-child {
+  font-weight: 700;
+  color: var(--color-gold);
+  text-align: center;
+  width: 60px;
+}
+
 /* === Onboarding === */
 .onboarding-modal {
   max-width: 520px;

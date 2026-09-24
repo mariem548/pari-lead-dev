@@ -319,6 +319,9 @@ export default function App() {
   // --- Render ---
   return (
     <div className="app">
+      {/* Knight rider animation */}
+      <KnightRider />
+
       {/* Header */}
       <header className="header">
         <div className="header-left">
@@ -915,6 +918,34 @@ function HallOfFameModal({ rounds, onClose }) {
 
 // === Confetti Overlay ===
 const CONFETTI_EMOJIS = ['⚔️', '🏹', '🛡️', '👑', '🏰', '🔥', '🏆', '⚔️', '🗡️', '🛡️']
+
+// === Knight Rider Animation ===
+function KnightRider() {
+  const [riding, setRiding] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRiding(true)
+      setTimeout(() => setRiding(false), 4000)
+    }, 20000)
+    return () => clearInterval(interval)
+  }, [])
+
+  if (!riding) return null
+
+  return (
+    <div className="knight-rider">
+      <div className="knight-horse">
+        <div className="knight-body">🐎</div>
+        <div className="knight-rider-figure">⚔️</div>
+        <div className="knight-cape"></div>
+      </div>
+      <div className="knight-dust">
+        <span>💨</span><span>💨</span><span>💨</span>
+      </div>
+    </div>
+  )
+}
 
 // === Sound effects (Web Audio API) ===
 let audioCtx = null

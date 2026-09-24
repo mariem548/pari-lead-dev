@@ -9,10 +9,7 @@ Le format suit [Conventional Commits](https://www.conventionalcommits.org/).
 ## [Unreleased]
 
 ### Removed
-- Mot de passe d'équipe et password gate (supprimé, non fonctionnel)
-- Fonction RPC verify_team_password
-- Table app_config
-- Bouton verrouiller/déverrouiller
+- Nettoyage des restes du système de mot de passe (RPC, table app_config)
 
 ### Fixed
 - Les nouveaux paris ne s'affichaient pas en mode partagé (Supabase) — mise à jour de l'état local systématique après chaque action

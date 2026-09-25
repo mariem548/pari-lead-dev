@@ -43,10 +43,10 @@ function StoryPopup({ open, onClose, mandatory = false }) {
         )}
         <div className="story-text">
           <p>En cette noble époque, où les chevaliers servent leur royaume et où l'honneur guide les plus braves, une idée des plus audacieuses naquit au sein de notre illustre compagnie.</p>
-          <p>Face aux retards légendaires de notre très honorable et suprême Lead Dev, une question demeurait sans réponse : à quelle heure daignera-t-il enfin franchir les portes du royaume ?</p>
-          <p>C'est ainsi que, dans un élan de solidarité sans pareil, notre valeureuse équipe décida de créer une application permettant à chacun de mettre à l'épreuve son sens de la prophétie et de parier sur l'heure d'arrivée de notre illustre seigneur technique.</p>
+          <p>Face aux retards légendaires qui rythmaient nos matinées, une question demeurait sans réponse : à quelle heure les portes du royaume seraient-elles enfin franchies ?</p>
+          <p>C'est ainsi que, dans un élan de solidarité sans pareil, notre valeureuse équipe décida de créer une application permettant à chacun de mettre à l'épreuve son sens de la prophétie et de parier sur une heure d'arrivée tant attendue.</p>
           <p>Mais nul projet d'une telle envergure n'aurait pu voir le jour sans le dévouement d'une âme particulièrement noble, douce et généreuse : <strong>Mariem</strong>.</p>
-          <p>Telle une chevaleresse au service de son royaume, elle sacrifia de son précieux temps, brava les épreuves du développement et consacra ses talents à cette noble entreprise. Après moult efforts, quelques batailles avec le code et probablement quelques soupirs, elle nous livra une œuvre magnifique : l'application officielle des paris sur l'arrivée de notre Suprême Lead Dev.</p>
+          <p>Telle une chevaleresse au service de son royaume, elle sacrifia de son précieux temps, brava les épreuves du développement et consacra ses talents à cette noble entreprise. Après moult efforts, quelques batailles avec le code et probablement quelques soupirs, elle nous livra une œuvre magnifique : l'application officielle des paris.</p>
           <p className="story-finale">Que les paris commencent.</p>
           <p className="story-finale">Que les prophéties s'affrontent.</p>
           <p className="story-finale">Et que le plus juste des chevaliers — ou le plus grand des devins — remporte la victoire.</p>
@@ -61,7 +61,7 @@ function StoryPopup({ open, onClose, mandatory = false }) {
 
 function Logo() {
   return (
-    <svg className="logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Pari Lead Dev">
+    <svg className="logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Pari">
       <path d="M8 56 L8 20 Q8 8 32 8 Q56 8 56 20 L56 56 Z" fill="#e8b84b" opacity="0.25" />
       <rect x="20" y="34" width="24" height="22" fill="#3a3a4a" />
       <rect x="14" y="26" width="9" height="30" fill="#4a4a5a" />
@@ -343,7 +343,7 @@ export default function App() {
           <div className="header-left">
             <Logo />
             <div>
-              <h1>Pari Lead Dev</h1>
+              <h1>Pari</h1>
               <p>Paris d'équipe</p>
             </div>
           </div>
@@ -391,7 +391,7 @@ export default function App() {
         <div className="header-left">
           <Logo />
           <div>
-            <h1>Pari Lead Dev</h1>
+            <h1>Pari</h1>
             <p>Paris d'équipe {isSupabaseConfigured ? '— partagé' : ''}</p>
           </div>
         </div>
@@ -639,7 +639,7 @@ function NewRoundForm({ onCreate }) {
       <div className="new-round-form">
         <div className="form-group">
           <label>Nom du pari</label>
-          <input type="text" placeholder="Arrivée du lead dev" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} />
+          <input type="text" placeholder="Heure d'arrivée" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} />
         </div>
         <div className="flex-gap-2">
           <button className="btn btn-primary" onClick={handleSubmit}>Créer le pari</button>
@@ -697,7 +697,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
         <div>
           <div className="card-title">{round.name}</div>
           <div className="card-subtitle">
-            Pari sur l'arrivée du Lead Dev — {round.bets.length} participant{round.bets.length > 1 ? 's' : ''}{round.createdAt ? ` — ${formatDate(round.createdAt)}` : ''}
+            Pari sur l'heure d'arrivée — {round.bets.length} participant{round.bets.length > 1 ? 's' : ''}{round.createdAt ? ` — ${formatDate(round.createdAt)}` : ''}
           </div>
         </div>
         <span className={`badge ${isOpen ? 'badge-open' : 'badge-closed'}`}>{isOpen ? 'Ouvert' : 'Fermé'}</span>
@@ -1073,7 +1073,7 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
                 <span className="recap-icon">🐌</span>
                 <div className="recap-text">
                   <strong>Jour le plus en retard</strong>
-                  <p>Le Suprême Lead Dev a brillé par son retard le <strong>{formatDate(latestDate)}</strong> à <strong>{formatTime(recap.latest.round.actualValue)}</strong>{latestDelay !== null && (<> — <strong>{latestDelay} min de retard</strong></>)}.</p>
+                  <p>Le retard a atteint son sommet le <strong>{formatDate(latestDate)}</strong> à <strong>{formatTime(recap.latest.round.actualValue)}</strong>{latestDelay !== null && (<> — <strong>{latestDelay} min de retard</strong></>)}.</p>
                   {recap.latest.winners.length > 0 && (
                     <p className="recap-winner">👏 Le royaume applaudit {recap.latest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} — grand{recap.latest.winners.length > 1 ? 's' : ''} prophète{recap.latest.winners.length > 1 ? 's' : ''} de ce jour de retard !</p>
                   )}
@@ -1083,7 +1083,7 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
                 <span className="recap-icon">⚡</span>
                 <div className="recap-text">
                   <strong>Jour le moins en retard</strong>
-                  <p>Notre Lead Dev a daigné se lever tôt le <strong>{formatDate(earliestDate)}</strong> à <strong>{formatTime(recap.earliest.round.actualValue)}</strong>{earliestDelay !== null && (<> — <strong>{earliestDelay <= 0 ? 'pile à l\'heure ou en avance' : `${earliestDelay} min de retard`}</strong></>)}.</p>
+                  <p>L'arrivée la plus matinale a eu lieu le <strong>{formatDate(earliestDate)}</strong> à <strong>{formatTime(recap.earliest.round.actualValue)}</strong>{earliestDelay !== null && (<> — <strong>{earliestDelay <= 0 ? 'pile à l\'heure ou en avance' : `${earliestDelay} min de retard`}</strong></>)}.</p>
                   {recap.earliest.winners.length > 0 && (
                     <p className="recap-winner">👏 Félicitations à {recap.earliest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} pour cette prédiction matinale !</p>
                   )}
@@ -1284,7 +1284,7 @@ function ShareableParchment({ recap, monthName }) {
 🎯 Prédiction la plus précise: ${recap.bestBet?.name} (${recap.bestBet?.diff} min)
 📊 Total: ${recap.totalRounds} paris - Moyenne: ${formatTime(recap.avgArrival)}
 
-Via Pari Lead Dev`
+Via Pari`
     try {
       navigator.clipboard.writeText(text)
       setCopied(true)
@@ -1344,7 +1344,7 @@ function PlayerJoust({ leaderboard }) {
 const TROPHIES = [
   { id: 'pile', icon: '🎯', name: 'Pile à l\'heure', desc: 'Prédiction exacte (0 min d\'écart)' },
   { id: 'proche', icon: '🏹', name: 'Presque devin', desc: 'Prédiction à 5 min ou moins' },
-  { id: 'optimiste', icon: '🌅', name: 'Trop optimiste', desc: 'Toujours en avance sur le lead dev' },
+  { id: 'optimiste', icon: '🌅', name: 'Trop optimiste', desc: 'Toujours en avance' },
   { id: 'cafe', icon: '☕', name: 'Prophète du café', desc: 'Au moins 3 paris avant 10h' },
   { id: 'stagiaire', icon: '📝', name: 'Stagiaire du Royaume', desc: 'Premier pari joué' },
   { id: 'habitue', icon: '⚔️', name: 'Habitué de la taverne', desc: 'Au moins 5 paris joués' },
@@ -1473,10 +1473,10 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
 }
 
 const TRIBUNAL_VERDICTS = [
-  { max: 0, verdict: 'acquitte', icon: '⚖️', text: "Le tribunal royal acquitte le Lead Dev. Arrive pile a l'heure, une rarete digne des legendes." },
-  { max: 15, verdict: 'rappel', icon: '⚖️', text: "Le tribunal rappelle le Lead Dev a l'ordre pour un retard de {delay} minutes. Le royaume lui accorde le benefice du doute." },
-  { max: 45, verdict: 'coupable', icon: '⚖️', text: 'Le tribunal declare le Lead Dev coupable de {delay} minutes de retard. La couronne exige reparation.' },
-  { max: 999, verdict: 'aggravantes', icon: '⚖️', text: "Le tribunal declare le Lead Dev coupable de {delay} minutes de retard avec circonstances aggravantes. Le donjon l'attend." },
+  { max: 0, verdict: 'acquitte', icon: '⚖️', text: "Le tribunal royal acquitte l'accusé. Arrivée pile a l'heure, une rarete digne des legendes." },
+  { max: 15, verdict: 'rappel', icon: '⚖️', text: "Le tribunal rappelle l'accusé a l'ordre pour un retard de {delay} minutes. Le royaume lui accorde le benefice du doute." },
+  { max: 45, verdict: 'coupable', icon: '⚖️', text: "Le tribunal declare l'accusé coupable de {delay} minutes de retard. La couronne exige reparation." },
+  { max: 999, verdict: 'aggravantes', icon: '⚖️', text: "Le tribunal declare l'accusé coupable de {delay} minutes de retard avec circonstances aggravantes. Le donjon l'attend." },
 ]
 
 function RoyalTribunal({ rounds }) {
@@ -1524,7 +1524,7 @@ function GameRulesModal({ open, onClose, mandatory = false }) {
 
         <div className="rules-section">
           <h3>🎯 But du jeu</h3>
-          <p>Devinez l'heure d'arrivée du Suprême Lead Dev. Celui dont la prédiction est la plus proche de l'heure réelle remporte la victoire et gagne des points de renommée.</p>
+          <p>Devinez l'heure d'arrivée. Celui dont la prédiction est la plus proche de l'heure réelle remporte la victoire et gagne des points de renommée.</p>
         </div>
 
         <div className="rules-section">
@@ -1532,15 +1532,15 @@ function GameRulesModal({ open, onClose, mandatory = false }) {
           <ol className="rules-list">
             <li><strong>Choisis ton identité</strong> : au premier lancement, choisis ton avatar et ton pseudo. Ils restent les mêmes tout au long de l'aventure.</li>
             <li><strong>Crée un pari</strong> : clique sur « + Nouveau pari » et donne-lui un nom.</li>
-            <li><strong>Parie une heure</strong> : saisis l'heure à laquelle tu penses que le Lead Dev arrivera. Formats acceptés : <code>9.30</code>, <code>9:30</code>, <code>9h30</code>, <code>10</code>.</li>
-            <li><strong>Clôture</strong> : quand le Lead Dev arrive, saisis l'heure réelle. L'app calcule automatiquement le gagnant.</li>
+            <li><strong>Parie une heure</strong> : saisis l'heure à laquelle tu penses que l'arrivée aura lieu. Formats acceptés : <code>9.30</code>, <code>9:30</code>, <code>9h30</code>, <code>10</code>.</li>
+            <li><strong>Clôture</strong> : quand l'arrivée a lieu, saisis l'heure réelle. L'app calcule automatiquement le gagnant.</li>
           </ol>
         </div>
 
         <div className="rules-section">
           <h3>🏆 Score & points</h3>
           <p>Le joueur dont la prédiction est la <strong>plus proche</strong> de l'heure réelle gagne <strong>1 point</strong>. En cas d'égalité parfaite, tous les ex aequo gagnent. Les points s'accumulent au fil des paris.</p>
-          <p>Le retard du Lead Dev est calculé à partir de <strong>9h35</strong> (heure officielle de début). Si le Lead Dev arrive à 10h02, son retard est de <strong>27 minutes</strong>.</p>
+          <p>Le retard est calculé à partir de <strong>9h35</strong> (heure officielle de début). Si l'arrivée a lieu à 10h02, le retard est de <strong>27 minutes</strong>.</p>
         </div>
 
         <div className="rules-section">
@@ -1572,7 +1572,7 @@ function GameRulesModal({ open, onClose, mandatory = false }) {
 
         <div className="rules-section">
           <h3>📅 Calendrier archivé</h3>
-          <p>Un onglet <strong>Calendrier</strong> apparaît une fois qu'un mois complet est passé, à côté de l'onglet Royaume. Il permet de consulter l'historique des retards du Lead Dev, mois par mois.</p>
+          <p>Un onglet <strong>Calendrier</strong> apparaît une fois qu'un mois complet est passé, à côté de l'onglet Royaume. Il permet de consulter l'historique des retards, mois par mois.</p>
         </div>
 
         <div className="rules-section">

@@ -1035,6 +1035,8 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
 
   const latestDate = recap.latest.round.closedAt
   const earliestDate = recap.earliest.round.closedAt
+  const latestDelay = computeDelayMinutes(recap.latest.round.actualValue)
+  const earliestDelay = computeDelayMinutes(recap.earliest.round.actualValue)
 
   return (
     <>
@@ -1052,20 +1054,20 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
               <div className="recap-item recap-late">
                 <span className="recap-icon">🐌</span>
                 <div className="recap-text">
-                  <strong>Arrivée la plus tardive</strong>
-                  <p>Le Suprême Lead Dev a brillé par son retard le <strong>{formatDate(latestDate)}</strong> à <strong>{formatTime(recap.latest.round.actualValue)}</strong>.</p>
+                  <strong>Jour le plus en retard</strong>
+                  <p>Le Suprême Lead Dev a brillé par son retard le <strong>{formatDate(latestDate)}</strong> à <strong>{formatTime(recap.latest.round.actualValue)}</strong>{latestDelay !== null && (<> — <strong>{latestDelay} min de retard</strong></>)}.</p>
                   {recap.latest.winners.length > 0 && (
-                    <p className="recap-winner">👏 Le royaume applaudit {recap.latest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} — grand{recap.latest.winners.length > 1 ? 's' : ''} prophète{recap.latest.winners.length > 1 ? 's' : ''} du jour !</p>
+                    <p className="recap-winner">👏 Le royaume applaudit {recap.latest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} — grand{recap.latest.winners.length > 1 ? 's' : ''} prophète{recap.latest.winners.length > 1 ? 's' : ''} de ce jour de retard !</p>
                   )}
                 </div>
               </div>
               <div className="recap-item recap-early">
                 <span className="recap-icon">⚡</span>
                 <div className="recap-text">
-                  <strong>Arrivée la plus tôt</strong>
-                  <p>Notre Lead Dev a daigné se lever tôt le <strong>{formatDate(earliestDate)}</strong> à <strong>{formatTime(recap.earliest.round.actualValue)}</strong>.</p>
+                  <strong>Jour le moins en retard</strong>
+                  <p>Notre Lead Dev a daigné se lever tôt le <strong>{formatDate(earliestDate)}</strong> à <strong>{formatTime(recap.earliest.round.actualValue)}</strong>{earliestDelay !== null && (<> — <strong>{earliestDelay <= 0 ? 'pile à l\'heure ou en avance' : `${earliestDelay} min de retard`}</strong></>)}.</p>
                   {recap.earliest.winners.length > 0 && (
-                    <p className="recap-winner">👏 Félicitations à {recap.earliest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} pour cette prédiction matiale !</p>
+                    <p className="recap-winner">👏 Félicitations à {recap.earliest.winners.map((w) => `${w.avatar || ''} ${w.name}`).join(', ')} pour cette prédiction matinale !</p>
                   )}
                 </div>
               </div>
@@ -1579,7 +1581,7 @@ function GameRulesModal({ open, onClose, mandatory = false }) {
 
         <div className="rules-section">
           <h3>📜 Parchemin Royal</h3>
-          <p>À la fin du mois, le <strong>Parchemin Royal</strong> récapitule tout : l'arrivée la plus tardive, la plus tôt, le Grand Oracle du mois, la meilleure prédiction, et l'heure d'arrivée moyenne. Un badge « ! » apparaît quand le rapport est prêt. Tu peux le copier pour le partager sur Slack ou Teams.</p>
+          <p>À la fin du mois, le <strong>Parchemin Royal</strong> récapitule tout : le jour le plus en retard, le jour le moins en retard, le Grand Oracle du mois, la meilleure prédiction, et l'heure d'arrivée moyenne. Un badge « ! » apparaît quand le rapport est prêt. Tu peux le copier pour le partager sur Slack ou Teams.</p>
         </div>
 
         <div className="rules-section">

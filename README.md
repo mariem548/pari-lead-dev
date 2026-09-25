@@ -16,8 +16,6 @@ Que les prophéties s'affrontent.
 
 Et que le plus juste des chevaliers — ou le plus grand des devins — remporte la victoire.
 
----
-
 ## Guide royal de l'utilisateur
 
 Noble voyageur, si tu viens d'arriver dans ce royaume, voici comment utiliser l'application étape par étape.
@@ -36,64 +34,25 @@ Après le README, les règles du jeu s'affichent. Elles expliquent le score, les
 
 ### Étape 4 — Créer un pari
 
-Une fois dans l'application, clique sur **"+ Nouveau pari"**. Donne-lui un nom (par exemple "Arrivée du Lead Dev"). Le pari est maintenant ouvert.
+Une fois dans l'application, clique sur "+ Nouveau pari". Donne-lui un nom (par exemple "Arrivée du Lead Dev"). Le pari est maintenant ouvert.
 
 ### Étape 5 — Parier une heure
 
 Saisis l'heure à laquelle tu penses que le Lead Dev arrivera. L'application accepte plusieurs formats :
 
 | Saisie | Interprétation |
-|--------|---------------|
-| `9.3` | 9h30 |
-| `9.30` | 9h30 |
-| `9:30` | 9h30 |
-| `9h30` | 9h30 |
-| `10` | 10h00 |
+|---|---|
+| 9.3 | 9h30 |
+| 9.30 | 9h30 |
+| 9:30 | 9h30 |
+| 9h30 | 9h30 |
+| 10 | 10h00 |
 
 Ton profil (avatar + pseudo) est automatiquement utilisé. Tu n'as rien d'autre à saisir.
 
 ### Étape 6 — Clôturer le pari
 
 Quand le Lead Dev arrive, saisis l'heure réelle dans le champ "Heure d'arrivée réelle" et valide. L'application calcule automatiquement le gagnant (celui qui est le plus proche) et lui attribue un point.
-
-### Étape 7 — Explorer le Royaume
-
-L'onglet **Royaume** contient toute ton aventure :
-
-- **Carte du royaume** : vois les joueurs avancer du Village jusqu'au Château GIT
-- **Météo du royaume** : le temps change selon l'heure d'arrivée du Lead Dev
-- **Joutes** : les deux meilleurs joueurs s'affrontent
-- **Quêtes du jour** : complète des challenges
-- **Coffre aux exploits** : débloque des trophées
-- **Calendrier des retards** : visualise les retards du mois
-- **Tribunal Royal** : verdict automatique sur le retard du Lead Dev
-- **Pigeon Voyageur** : message quotidien absurde
-- **Donjon de la Honte** : le pire pari du jour
-- **Marché Noir des Excuses** : excuses probables du Lead Dev
-
-### Le retard calculé à partir de 9h35
-
-Le royaume commence à compter le retard du Lead Dev à partir de **9h35**, l'heure officielle de début du travail. Si le Lead Dev arrive à 10h02, son retard est de **27 minutes**. S'il arrive avant 9h35, il est "en avance".
-
----
-
-## Que nul ne croie que ces armoiries furent dessinées au hasard
-
-Que nul ne croie que ces armoiries furent dessinées au hasard. Chaque détail de ce royaume, du château GIT sculpté dans l'or jusqu'au plus humble des avatars, est le fruit de maintes délibérations au conseil des anciens.
-
-Le logo, ce fier château où s'inscrit "GIT" en lettres d'or, ne fut pas gravé en un jour. Les épées croisées qui le gardent furent forgées dans les flammes de mille débats. Le chevalier qui veille sur le royaume ne fut pas choisi par hasard : son destrier, sa cape, sa lance, tout fut pesé, mesuré, discuté.
-
-Les douze avatars qui peuplent ce royaume ne sont pas nés du caprice. Le Chevalier, l'Archer, le Mage, le Roi, le Garde, le Guerrier, l'Assassin, le Scribe, le Seigneur, le Dragonnier, le Pyromancien et la Sorcière — chacun fut examiné, débattu, adopté ou rejeté lors de longues assemblées. Nul ne fut admis sans l'accord du conseil.
-
-Les blasons des maisons — Crépuscule, Fort, Dragon et Taverne — furent dessinés à la plume, effacés, redessinés. Les titres de noblesse, du Vilain du village au Souverain du Retard, furent calibrés avec la précision d'un horloger royal.
-
-Les punchlines, les excuses du Marché Noir, les messages du Pigeon Voyageur : chaque mot fut soupesé, goûté, recraché parfois, jusqu'à ce que la forme parfaite fût trouvée.
-
-Que les sceptiques le sachent : même la couleur du parchemin, même l'épaisseur de la bordure dorée, même le choix entre une épée et une lance pour le gardien du château — tout, absolument tout, est le fruit d'une réflexion profonde, patiente et acharnée.
-
-Ce royaume n'est pas une application. C'est une œuvre. Et comme toute œuvre digne de ce nom, elle porte les traces de mille mains ayant œuvré dans l'ombre.
-
----
 
 ## Prérequis techniques
 
@@ -114,7 +73,7 @@ npm install
 npm run dev
 ```
 
-L'app est accessible sur `http://localhost:5173`.
+L'app est accessible sur http://localhost:5173.
 
 ## Build de production
 
@@ -122,48 +81,43 @@ L'app est accessible sur `http://localhost:5173`.
 npm run build
 ```
 
-Les fichiers compilés sont dans le dossier `dist/`.
-
----
+Les fichiers compilés sont dans le dossier dist/.
 
 ## Mode partagé (Supabase)
 
-Par défaut, l'app fonctionne en **mode local** : les données sont stockées dans le navigateur de chacun.
+Par défaut, l'app fonctionne en mode local : les données sont stockées dans le navigateur de chacun.
 
 Pour que toute l'équipe voie les mêmes paris en temps réel, configure Supabase :
 
 ### 1. Créer un projet Supabase
 
-Va sur [supabase.com](https://supabase.com), crée un compte et un nouveau projet.
+Va sur supabase.com, crée un compte et un nouveau projet.
 
 ### 2. Créer les tables
 
-Dans **SQL Editor**, colle et exécute le contenu du fichier [`supabase.sql`](./supabase.sql).
+Dans SQL Editor, colle et exécute le contenu du fichier supabase.sql.
 
 ### 3. Récupérer les clés
 
-Dans **Project Settings > API**, copie :
-- **Project URL** (ex: `https://xxxxx.supabase.co`)
-- **anon public key**
+Dans Project Settings > API, copie :
+
+- Project URL (ex: https://xxxxx.supabase.co)
+- anon public key
 
 ### 4. Configurer les variables GitHub
 
-Sur le repo GitHub, va dans **Settings > Secrets and variables > Actions > Variables** et ajoute :
+Sur le repo GitHub, va dans Settings > Secrets and variables > Actions > Variables et ajoute :
 
 | Variable | Valeur |
-|----------|--------|
-| `VITE_SUPABASE_URL` | Project URL |
-| `VITE_SUPABASE_ANON_KEY` | anon public key |
+|---|---|
+| VITE_SUPABASE_URL | Project URL |
+| VITE_SUPABASE_ANON_KEY | anon public key |
 
-Le prochain push sur `main` déploiera la version partagée.
-
----
+Le prochain push sur main déploiera la version partagée.
 
 ## Déploiement
 
-Le déploiement sur GitHub Pages est automatique via GitHub Actions à chaque push sur `main`.
-
----
+Le déploiement sur GitHub Pages est automatique via GitHub Actions à chaque push sur main.
 
 ## Architecture
 

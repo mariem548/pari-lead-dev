@@ -13,7 +13,6 @@ import {
   WORK_START_MINUTES,
 } from './lib/api'
 
-// === Avatars ===
 const AVATARS = [
   { emoji: '🤺', name: 'Chevalier' },
   { emoji: '🏹', name: 'Archer' },
@@ -32,16 +31,16 @@ const AVATARS = [
 const AVATAR_KEY = 'pari-lead-dev-avatar'
 const README_KEY = 'pari-lead-dev-readme-seen-v1'
 const RULES_KEY = 'pari-lead-dev-rules-seen-v1'
-
-// === Story popup ===
 const STORY_KEY = 'pari-lead-dev-story-seen'
 
-function StoryPopup({ open, onClose }) {
+function StoryPopup({ open, onClose, mandatory = false }) {
   if (!open) return null
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={mandatory ? undefined : onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Fermer">✕</button>
+        {!mandatory && (
+          <button className="modal-close" onClick={onClose} aria-label="Fermer">✕</button>
+        )}
         <div className="story-text">
           <p>En cette noble époque, où les chevaliers servent leur royaume et où l'honneur guide les plus braves, une idée des plus audacieuses naquit au sein de notre illustre compagnie.</p>
           <p>Face aux retards légendaires de notre très honorable et suprême Lead Dev, une question demeurait sans réponse : à quelle heure daignera-t-il enfin franchir les portes du royaume ?</p>
@@ -53,66 +52,47 @@ function StoryPopup({ open, onClose }) {
           <p className="story-finale">Et que le plus juste des chevaliers — ou le plus grand des devins — remporte la victoire.</p>
         </div>
         <button className="btn btn-primary modal-btn" onClick={onClose}>
-          Que les paris commencent
+          {mandatory ? "⚔️ J'ai lu l'histoire — continuer" : 'Que les paris commencent'}
         </button>
       </div>
     </div>
   )
 }
 
-// === Logo SVG ===
 function Logo() {
   return (
     <svg className="logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Pari Lead Dev">
-      {/* Background arch (mustard) */}
       <path d="M8 56 L8 20 Q8 8 32 8 Q56 8 56 20 L56 56 Z" fill="#e8b84b" opacity="0.25" />
-      {/* Castle towers */}
       <rect x="20" y="34" width="24" height="22" fill="#3a3a4a" />
       <rect x="14" y="26" width="9" height="30" fill="#4a4a5a" />
       <rect x="41" y="26" width="9" height="30" fill="#4a4a5a" />
-      {/* Tower cone roofs (red) */}
       <polygon points="14,26 18.5,18 23,26" fill="#c8443a" />
       <polygon points="41,26 45.5,18 50,26" fill="#c8443a" />
       <polygon points="20,34 32,22 44,34" fill="#c8443a" />
-      {/* Crenellations */}
       <rect x="14" y="23" width="2" height="4" fill="#4a4a5a" />
       <rect x="18" y="23" width="2" height="4" fill="#4a4a5a" />
       <rect x="41" y="23" width="2" height="4" fill="#4a4a5a" />
       <rect x="45" y="23" width="2" height="4" fill="#4a4a5a" />
-      {/* Windows (black slits) */}
       <rect x="16" y="32" width="1.5" height="6" fill="#1a1a2a" />
       <rect x="46" y="32" width="1.5" height="6" fill="#1a1a2a" />
-      {/* Castle door */}
       <path d="M27 50 Q27 44 32 44 Q37 44 37 50 L37 56 L27 56 Z" fill="#1a1a2a" />
-      {/* GIT text on castle wall */}
       <text x="32" y="40" textAnchor="middle" fontSize="8" fontWeight="700" fill="#e8b84b" fontFamily="Cinzel, serif" letterSpacing="0.5">GIT</text>
-      {/* Knight on horse (left foreground) */}
-      {/* Horse body */}
       <path d="M8 52 Q8 48 14 47 L22 47 Q26 47 28 50 L28 53 Q28 55 26 55 L24 55 L24 56 L22 56 L22 55 L14 55 Q8 55 8 52 Z" fill="#2a2a3a" />
-      {/* Horse legs */}
       <rect x="11" y="53" width="2" height="5" fill="#2a2a3a" />
       <rect x="24" y="53" width="2" height="5" fill="#2a2a3a" />
-      {/* Horse head */}
       <path d="M6 49 Q4 46 6 44 L10 44 Q12 46 11 49 L9 51 Q7 51 6 49 Z" fill="#2a2a3a" />
-      {/* Knight body (armor) */}
       <path d="M16 42 Q14 46 16 50 L22 50 Q24 46 22 42 Z" fill="#c8a032" />
-      {/* Knight head with crown */}
       <circle cx="19" cy="39" r="3.5" fill="#d4a04a" />
-      {/* Crown */}
       <polygon points="16,36 17.5,33 19,35 20.5,33 22,36" fill="#e8b84b" />
-      {/* Cape (red) */}
       <path d="M16 42 L13 50 L16 50 Z" fill="#c8443a" />
       <path d="M22 42 L25 50 L22 50 Z" fill="#c8443a" />
-      {/* Polearm/spear */}
       <line x1="24" y1="50" x2="27" y2="28" stroke="#e8b84b" strokeWidth="1.5" strokeLinecap="round" />
       <polygon points="26,28 27,24 28,28" fill="#c8443a" />
-      {/* Sun/crest on castle */}
       <circle cx="32" cy="28" r="3" fill="#e8b84b" opacity="0.6" />
     </svg>
   )
 }
 
-// === Theme ===
 function useTheme() {
   const [theme, setTheme] = useState(() => {
     try {
@@ -129,7 +109,6 @@ function useTheme() {
   return { theme, toggle: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')) }
 }
 
-// === Sun/Moon icons ===
 function SunIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -146,7 +125,6 @@ function MoonIcon() {
   )
 }
 
-// === Main App ===
 export default function App() {
   const { theme, toggle } = useTheme()
   const [rounds, setRounds] = useState([])
@@ -160,10 +138,8 @@ export default function App() {
       return true
     }
   })
-  // Story popup shows AFTER onboarding (mandatory read)
   const [showStory, setShowStory] = useState(false)
-  // Readme guide + mandatory rules
-  const [showReadmeGuide, setShowReadmeGuide] = useState(false)
+  const [showMandatoryStory, setShowMandatoryStory] = useState(false)
   const [showMandatoryRules, setShowMandatoryRules] = useState(false)
   const [avatarEntrance, setAvatarEntrance] = useState(false)
   const [activeTab, setActiveTab] = useState('paris')
@@ -202,12 +178,9 @@ export default function App() {
     setShowStory(false)
     try {
       sessionStorage.setItem(STORY_KEY, '1')
-    } catch {
-      // sessionStorage blocked
-    }
+    } catch {}
   }
 
-  // Load data
   const loadRounds = useCallback(async () => {
     try {
       const data = await api.fetchRounds()
@@ -224,16 +197,15 @@ export default function App() {
     loadRounds()
   }, [loadRounds])
 
-  // Check for existing users who need to read README/rules v1
   useEffect(() => {
     try {
       const hasUser = sessionStorage.getItem('pari-lead-dev-user')
       const hasAvatar = sessionStorage.getItem(AVATAR_KEY)
       if (hasUser && hasAvatar && !showOnboarding) {
-        const readmeSeen = sessionStorage.getItem(README_KEY)
+        const storySeen = sessionStorage.getItem(STORY_KEY)
         const rulesSeen = sessionStorage.getItem(RULES_KEY)
-        if (!readmeSeen) {
-          setShowReadmeGuide(true)
+        if (!storySeen) {
+          setShowMandatoryStory(true)
         } else if (!rulesSeen) {
           setShowMandatoryRules(true)
         }
@@ -241,7 +213,6 @@ export default function App() {
     } catch {}
   }, [showOnboarding])
 
-  // Real-time subscription
   useEffect(() => {
     if (!isSupabaseConfigured) return
     const unsubscribe = api.subscribe(() => {
@@ -255,7 +226,6 @@ export default function App() {
   const filteredRounds = useMemo(() => filterRoundsByPeriod(rounds, period), [rounds, period])
   const leaderboard = useMemo(() => computeLeaderboard(filteredRounds), [filteredRounds])
 
-  // --- Actions ---
   async function createRound(name, type) {
     try {
       const round = await api.createRound(name, type)
@@ -279,7 +249,6 @@ export default function App() {
         setAvatarEntrance(true)
         setTimeout(() => setAvatarEntrance(false), 100)
       } else {
-        // Supabase: reload to get the bet with correct ID
         loadRounds()
       }
     } catch (e) {
@@ -358,7 +327,6 @@ export default function App() {
     }
   }
 
-  // --- Loading state ---
   if (loading && !showOnboarding) {
     return (
       <div className="app">
@@ -379,12 +347,10 @@ export default function App() {
     )
   }
 
-  // --- Render ---
   return (
     <div className="app">
       <AvatarEntranceAnimation avatar={userAvatar} name={userName} trigger={avatarEntrance} />
 
-      {/* Onboarding modal - mandatory, no skip */}
       {showOnboarding && (
         <OnboardingModal
           userName={userName}
@@ -399,10 +365,9 @@ export default function App() {
             setShowOnboarding(false)
             setActiveTab('paris')
             setAvatarEntrance(true)
-            // Mandatory: README guide then rules
-            const readmeSeen = sessionStorage.getItem(README_KEY)
-            if (!readmeSeen) {
-              setShowReadmeGuide(true)
+            const storySeen = sessionStorage.getItem(STORY_KEY)
+            if (!storySeen) {
+              setShowMandatoryStory(true)
             } else {
               const rulesSeen = sessionStorage.getItem(RULES_KEY)
               if (!rulesSeen) {
@@ -413,7 +378,6 @@ export default function App() {
         />
       )}
 
-      {/* Header */}
       <header className="header">
         <div className="header-left">
           <Logo />
@@ -441,7 +405,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Setup banner */}
       {!isSupabaseConfigured && (
         <div className="setup-banner">
           <strong>Mode local</strong> — vos données sont sur votre navigateur uniquement.
@@ -449,35 +412,33 @@ export default function App() {
         </div>
       )}
 
-      {/* Story popup */}
       <StoryPopup open={showStory} onClose={closeStory} />
 
-      {/* Profile modal */}
+      <StoryPopup
+        open={showMandatoryStory}
+        mandatory
+        onClose={() => {
+          try {
+            sessionStorage.setItem(STORY_KEY, '1')
+          } catch {}
+          setShowMandatoryStory(false)
+          const rulesSeen = sessionStorage.getItem(RULES_KEY)
+          if (!rulesSeen) {
+            setShowMandatoryRules(true)
+          }
+        }}
+      />
+
       {profilePlayer && (
         <ProfileModal player={profilePlayer} onClose={() => setProfilePlayer(null)} />
       )}
 
-      {/* Hall of Fame modal */}
       {showHallOfFame && (
         <HallOfFameModal rounds={rounds} onClose={() => setShowHallOfFame(false)} />
       )}
 
-      {/* Game rules modal */}
       <GameRulesModal open={showRules} onClose={() => setShowRules(false)} />
 
-      {/* Mandatory README guide */}
-      <ReadmeGuideModal
-        open={showReadmeGuide}
-        onNext={() => {
-          try {
-            sessionStorage.setItem(README_KEY, '1')
-          } catch {}
-          setShowReadmeGuide(false)
-          setShowMandatoryRules(true)
-        }}
-      />
-
-      {/* Mandatory rules */}
       <GameRulesModal
         open={showMandatoryRules}
         mandatory={true}
@@ -490,10 +451,8 @@ export default function App() {
         }}
       />
 
-      {/* Confetti overlay */}
       {confetti && <ConfettiOverlay />}
 
-      {/* Toast notifications */}
       <div className="toast-container">
         {toasts.map((t) => (
           <div key={t.id} className={`toast toast-${t.type}`}>
@@ -502,59 +461,33 @@ export default function App() {
         ))}
       </div>
 
-      {/* Error */}
       {error && (
         <div className="error-banner" onClick={() => setError('')}>
           {error} ✕
         </div>
       )}
 
-      {/* Tab navigation */}
       <nav className="tab-nav">
-        <button
-          className={`tab-btn ${activeTab === 'paris' ? 'active' : ''}`}
-          onClick={() => setActiveTab('paris')}
-        >
+        <button className={`tab-btn ${activeTab === 'paris' ? 'active' : ''}`} onClick={() => setActiveTab('paris')}>
           ⚔️ Salle des paris
         </button>
-        <button
-          className={`tab-btn ${activeTab === 'classement' ? 'active' : ''}`}
-          onClick={() => setActiveTab('classement')}
-        >
+        <button className={`tab-btn ${activeTab === 'classement' ? 'active' : ''}`} onClick={() => setActiveTab('classement')}>
           👑 Royaume
         </button>
       </nav>
 
       {activeTab === 'paris' && (
       <>
-      {/* New round form */}
       <NewRoundForm onCreate={createRound} />
 
-      {/* Period filter */}
       {rounds.length > 0 && (
         <div className="period-filter">
-          <button
-            className={`period-btn ${period === 'week' ? 'active' : ''}`}
-            onClick={() => setPeriod('week')}
-          >
-            Cette semaine
-          </button>
-          <button
-            className={`period-btn ${period === 'month' ? 'active' : ''}`}
-            onClick={() => setPeriod('month')}
-          >
-            Ce mois
-          </button>
-          <button
-            className={`period-btn ${period === 'all' ? 'active' : ''}`}
-            onClick={() => setPeriod('all')}
-          >
-            Tout
-          </button>
+          <button className={`period-btn ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>Cette semaine</button>
+          <button className={`period-btn ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>Ce mois</button>
+          <button className={`period-btn ${period === 'all' ? 'active' : ''}`} onClick={() => setPeriod('all')}>Tout</button>
         </div>
       )}
 
-      {/* Rounds */}
       {rounds.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">🏰</div>
@@ -593,7 +526,6 @@ export default function App() {
         </>
       )}
 
-      {/* Leaderboard */}
       {leaderboard.length > 0 && (
         <>
           <h2 className="section-title">
@@ -615,9 +547,7 @@ export default function App() {
                   {entry.currentStreak >= 2 && (
                     <span className="streak-badge">🔥 {entry.currentStreak}</span>
                   )}
-                  <div className="leaderboard-score">
-                    {entry.score} pt{entry.score > 1 ? 's' : ''}
-                  </div>
+                  <div className="leaderboard-score">{entry.score} pt{entry.score > 1 ? 's' : ''}</div>
                 </div>
               ))}
             </div>
@@ -625,18 +555,14 @@ export default function App() {
         </>
       )}
 
-      {/* Reset */}
       {rounds.length > 0 && (
         <div className="text-center mt-4">
-          <button className="btn btn-ghost" onClick={resetAll}>
-            Tout effacer
-          </button>
+          <button className="btn btn-ghost" onClick={resetAll}>Tout effacer</button>
         </div>
       )}
       </>
       )}
 
-      {/* Classement tab - Kingdom Map */}
       {activeTab === 'classement' && (
         <KingdomLeaderboard
           leaderboard={leaderboard}
@@ -650,7 +576,6 @@ export default function App() {
   )
 }
 
-// === Local parsing helpers (for localStorage mode) ===
 function parseTimeLocal(input) {
   if (!input || typeof input !== 'string') return null
   const cleaned = input.replace(/[hH:]/g, '.').trim()
@@ -673,7 +598,6 @@ function parseNumberLocal(input) {
   return isNaN(n) ? null : n
 }
 
-// === New Round Form ===
 function NewRoundForm({ onCreate }) {
   const [name, setName] = useState('')
   const [expanded, setExpanded] = useState(false)
@@ -697,21 +621,11 @@ function NewRoundForm({ onCreate }) {
       <div className="new-round-form">
         <div className="form-group">
           <label>Nom du pari</label>
-          <input
-            type="text"
-            placeholder="Arrivée du lead dev"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          />
+          <input type="text" placeholder="Arrivée du lead dev" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} />
         </div>
         <div className="flex-gap-2">
-          <button className="btn btn-primary" onClick={handleSubmit}>
-            Créer le pari
-          </button>
-          <button className="btn btn-secondary" onClick={() => setExpanded(false)}>
-            Annuler
-          </button>
+          <button className="btn btn-primary" onClick={handleSubmit}>Créer le pari</button>
+          <button className="btn btn-secondary" onClick={() => setExpanded(false)}>Annuler</button>
         </div>
         <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
           Format heure : 9.30 = 9h30, 9.3 = 9h30, 9:30 = 9h30, 10 = 10h00
@@ -721,7 +635,6 @@ function NewRoundForm({ onCreate }) {
   )
 }
 
-// === Round Card ===
 function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, userAvatar, setUserAvatar, userName }) {
   const [betValue, setBetValue] = useState('')
   const [actualInput, setActualInput] = useState(round.actualInput || '')
@@ -733,10 +646,7 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
   function handleAddBet() {
     if (!betValue.trim()) return
     const value = parseTimeLocal(betValue)
-    if (value === null) {
-      setError('Format invalide. Ex: 9.30, 9:30, 10h00')
-      return
-    }
+    if (value === null) { setError('Format invalide. Ex: 9.30, 9:30, 10h00'); return }
     setError('')
     onAddBet(round.id, userName, betValue, 'time', userAvatar)
     setBetValue('')
@@ -745,20 +655,14 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
   function handleClose() {
     if (!actualInput.trim()) return
     const value = parseTimeLocal(actualInput)
-    if (value === null) {
-      setError('Format invalide')
-      return
-    }
+    if (value === null) { setError('Format invalide'); return }
     setError('')
     onClose(round.id, actualInput, 'time')
   }
 
-  // Sort bets by value for display
   const sortedBets = [...round.bets].sort((a, b) => a.value - b.value)
 
-  function formatValue(v) {
-    return formatTime(v)
-  }
+  function formatValue(v) { return formatTime(v) }
 
   function formatDiff(bet) {
     if (round.actualValue === null || round.actualValue === undefined) return ''
@@ -771,7 +675,6 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
 
   return (
     <div className="card">
-      {/* Header */}
       <div className="card-header">
         <div>
           <div className="card-title">{round.name}</div>
@@ -779,22 +682,16 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
             Pari sur l'arrivée du Lead Dev — {round.bets.length} participant{round.bets.length > 1 ? 's' : ''}{round.createdAt ? ` — ${formatDate(round.createdAt)}` : ''}
           </div>
         </div>
-        <span className={`badge ${isOpen ? 'badge-open' : 'badge-closed'}`}>
-          {isOpen ? 'Ouvert' : 'Fermé'}
-        </span>
+        <span className={`badge ${isOpen ? 'badge-open' : 'badge-closed'}`}>{isOpen ? 'Ouvert' : 'Fermé'}</span>
       </div>
 
-      {/* Bets list */}
       {sortedBets.length > 0 && (
         <div className="bet-list">
           {sortedBets.map((bet) => {
             const isWinner = winners.includes(bet.id)
             const isTied = isWinner && winners.length > 1
             return (
-              <div
-                key={bet.id}
-                className={`bet-item ${isWinner ? (isTied ? 'is-tied' : 'is-winner') : ''}`}
-              >
+              <div key={bet.id} className={`bet-item ${isWinner ? (isTied ? 'is-tied' : 'is-winner') : ''}`}>
                 <div className="bet-item-left">
                   <span className="bet-item-avatar">{bet.avatar || '🛡️'}</span>
                   <span className="bet-item-name">{bet.name}</span>
@@ -805,18 +702,10 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
                     <span className="bet-item-diff">{formatDiff(bet)}</span>
                   )}
                   {isWinner && (
-                    <span className={`badge ${isTied ? 'badge-gold' : 'badge-winner'}`}>
-                      {isTied ? 'Égalité' : 'Gagnant'}
-                    </span>
+                    <span className={`badge ${isTied ? 'badge-gold' : 'badge-winner'}`}>{isTied ? 'Égalité' : 'Gagnant'}</span>
                   )}
                   {isOpen && (
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => onRemoveBet(round.id, bet.id)}
-                      aria-label={`Retirer le pari de ${bet.name}`}
-                    >
-                      ✕
-                    </button>
+                    <button className="btn btn-danger" onClick={() => onRemoveBet(round.id, bet.id)} aria-label={`Retirer le pari de ${bet.name}`}>✕</button>
                   )}
                 </div>
               </div>
@@ -825,7 +714,6 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
         </div>
       )}
 
-      {/* Add bet form (only if open) */}
       {isOpen && (
         <>
           <div className="add-bet-form">
@@ -833,57 +721,32 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
               <span className="bet-form-avatar">{userAvatar || '🛡️'}</span>
               <span className="bet-form-name">{userName || 'Anonyme'}</span>
             </div>
-            <input
-              type="text"
-              placeholder="9.30"
-              value={betValue}
-              onChange={(e) => setBetValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddBet()}
-            />
-            <button className="btn btn-secondary" onClick={handleAddBet}>
-              + Ajouter
-            </button>
+            <input type="text" placeholder="9.30" value={betValue} onChange={(e) => setBetValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddBet()} />
+            <button className="btn btn-secondary" onClick={handleAddBet}>+ Ajouter</button>
           </div>
           {error && (
-            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', marginTop: 'var(--space-2)' }}>
-              {error}
-            </p>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', marginTop: 'var(--space-2)' }}>{error}</p>
           )}
         </>
       )}
 
-      {/* Close round form (only if open and has bets) */}
       {isOpen && round.bets.length > 0 && (
         <div className="close-round">
           <div className="form-group">
-            <label>
-              Heure d'arrivée réelle
-            </label>
-            <input
-              type="text"
-              placeholder="10.00"
-              value={actualInput}
-              onChange={(e) => setActualInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleClose()}
-            />
+            <label>Heure d'arrivée réelle</label>
+            <input type="text" placeholder="10.00" value={actualInput} onChange={(e) => setActualInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleClose()} />
           </div>
-          <button className="btn btn-primary" onClick={handleClose}>
-            Valider le résultat
-          </button>
+          <button className="btn btn-primary" onClick={handleClose}>Valider le résultat</button>
         </div>
       )}
 
-      {/* Result display (if closed) */}
       {!isOpen && round.actualValue !== null && (
         <div className="result-box">
-          <div className="result-box-title">
-            Heure d'arrivée
-          </div>
+          <div className="result-box-title">Heure d'arrivée</div>
           <div className="result-value">{formatValue(round.actualValue)}</div>
           {round.actualValue !== null && round.actualValue !== undefined && (
             <div className="result-delay">{formatDelay(round.actualValue)}</div>
           )}
-          {/* Tribunal Royal verdict on closed round */}
           {!isOpen && round.actualValue !== null && round.actualValue !== undefined && (() => {
             const delay = computeDelayMinutes(round.actualValue)
             if (delay === null) return null
@@ -902,37 +765,26 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
               {winners.length === 1 ? (
                 <span><strong>{round.bets.find((b) => b.id === winners[0])?.name}</strong> gagne +{round.pointsPerWin} pt</span>
               ) : (
-                <span>
-                  <strong>{winners.map((id) => round.bets.find((b) => b.id === id)?.name).join(', ')}</strong> — égalité, +{round.pointsPerWin} pt chacun
-                </span>
+                <span><strong>{winners.map((id) => round.bets.find((b) => b.id === id)?.name).join(', ')}</strong> — égalité, +{round.pointsPerWin} pt chacun</span>
               )}
             </div>
           )}
         </div>
       )}
 
-      {/* Actions for closed rounds */}
       {!isOpen && (
         <div className="flex-gap-2 mt-4">
-          <button className="btn btn-secondary" onClick={() => onReopen(round.id)}>
-            Rouvrir le pari
-          </button>
-          <button className="btn btn-danger" onClick={() => onDelete(round.id)}>
-            Supprimer
-          </button>
+          <button className="btn btn-secondary" onClick={() => onReopen(round.id)}>Rouvrir le pari</button>
+          <button className="btn btn-danger" onClick={() => onDelete(round.id)}>Supprimer</button>
         </div>
       )}
 
-      {/* Delete for open rounds */}
       {isOpen && round.bets.length === 0 && (
         <div className="flex-gap-2 mt-4">
-          <button className="btn btn-danger" onClick={() => onDelete(round.id)}>
-            Supprimer
-          </button>
+          <button className="btn btn-danger" onClick={() => onDelete(round.id)}>Supprimer</button>
         </div>
       )}
 
-      {/* Carte des prédictions */}
       {round.bets.length > 0 && (
         <DistributionChart round={round} />
       )}
@@ -940,10 +792,8 @@ function RoundCard({ round, onAddBet, onRemoveBet, onClose, onReopen, onDelete, 
   )
 }
 
-// === Carte des prédictions ===
 function DistributionChart({ round }) {
   const [show, setShow] = useState(false)
-
   const bets = [...round.bets].sort((a, b) => a.value - b.value)
   const values = bets.map((b) => b.value)
   const min = Math.min(...values)
@@ -952,9 +802,7 @@ function DistributionChart({ round }) {
 
   return (
     <div className="dist-chart-section">
-      <button className="dist-toggle" onClick={() => setShow(!show)}>
-        📜 Carte des prédictions {show ? '▲' : '▼'}
-      </button>
+      <button className="dist-toggle" onClick={() => setShow(!show)}>📜 Carte des prédictions {show ? '▲' : '▼'}</button>
       {show && (
         <div className="dist-chart">
           {bets.map((bet) => {
@@ -964,21 +812,14 @@ function DistributionChart({ round }) {
               <div key={bet.id} className="dist-bar-row">
                 <span className="dist-bar-label">{bet.avatar || '🛡️'} {bet.name}</span>
                 <div className="dist-bar-track">
-                  <div
-                    className={`dist-bar-fill ${isWinner ? 'winner' : ''}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                  <span className="dist-bar-value">
-                    {formatTime(bet.value)}
-                  </span>
+                  <div className={`dist-bar-fill ${isWinner ? 'winner' : ''}`} style={{ width: `${pct}%` }} />
+                  <span className="dist-bar-value">{formatTime(bet.value)}</span>
                 </div>
               </div>
             )
           })}
           {round.actualValue !== null && round.actualValue !== undefined && (
-            <div className="dist-actual">
-              🎯 Résultat : {formatTime(round.actualValue)}
-            </div>
+            <div className="dist-actual">🎯 Résultat : {formatTime(round.actualValue)}</div>
           )}
         </div>
       )}
@@ -986,11 +827,9 @@ function DistributionChart({ round }) {
   )
 }
 
-// === Profile Modal ===
 function ProfileModal({ player, onClose }) {
   const total = player.wins + player.losses
   const winRate = total > 0 ? Math.round((player.wins / total) * 100) : 0
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -1000,40 +839,20 @@ function ProfileModal({ player, onClose }) {
           <h2>{player.name}</h2>
         </div>
         <div className="profile-stats">
-          <div className="profile-stat">
-            <span className="stat-value">{player.score}</span>
-            <span className="stat-label">Points</span>
-          </div>
-          <div className="profile-stat">
-            <span className="stat-value">{player.wins}</span>
-            <span className="stat-label">Victoires</span>
-          </div>
-          <div className="profile-stat">
-            <span className="stat-value">{player.losses}</span>
-            <span className="stat-label">Défaites</span>
-          </div>
-          <div className="profile-stat">
-            <span className="stat-value">{winRate}%</span>
-            <span className="stat-label">Win rate</span>
-          </div>
-          <div className="profile-stat">
-            <span className="stat-value">{player.currentStreak}</span>
-            <span className="stat-label">Série actuelle</span>
-          </div>
-          <div className="profile-stat">
-            <span className="stat-value">{player.bestStreak}</span>
-            <span className="stat-label">Meilleure série</span>
-          </div>
+          <div className="profile-stat"><span className="stat-value">{player.score}</span><span className="stat-label">Points</span></div>
+          <div className="profile-stat"><span className="stat-value">{player.wins}</span><span className="stat-label">Victoires</span></div>
+          <div className="profile-stat"><span className="stat-value">{player.losses}</span><span className="stat-label">Défaites</span></div>
+          <div className="profile-stat"><span className="stat-value">{winRate}%</span><span className="stat-label">Win rate</span></div>
+          <div className="profile-stat"><span className="stat-value">{player.currentStreak}</span><span className="stat-label">Série actuelle</span></div>
+          <div className="profile-stat"><span className="stat-value">{player.bestStreak}</span><span className="stat-label">Meilleure série</span></div>
         </div>
       </div>
     </div>
   )
 }
 
-// === Hall of Fame Modal ===
 function HallOfFameModal({ rounds, onClose }) {
   const hallOfFame = useMemo(() => computeHallOfFame(rounds), [rounds])
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -1050,12 +869,7 @@ function HallOfFameModal({ rounds, onClose }) {
                 <span className="hof-avatar">{entry.avatar || '🛡️'}</span>
                 <div className="hof-info">
                   <span className="hof-name">{entry.name}</span>
-                  <span className="hof-detail">
-                    {formatTime(entry.value)}
-                    {' → '}
-                    {formatTime(entry.actualValue)}
-                    {' ('}écart: {entry.diff} min{')'}
-                  </span>
+                  <span className="hof-detail">{formatTime(entry.value)}{' → '}{formatTime(entry.actualValue)}{' ('}écart: {entry.diff} min{')'}</span>
                   <span className="hof-round">{entry.roundName}</span>
                 </div>
                 {entry.isWinner && <span className="hof-badge">👑 Gagnant</span>}
@@ -1068,23 +882,17 @@ function HallOfFameModal({ rounds, onClose }) {
   )
 }
 
-// === Confetti Overlay ===
 const CONFETTI_EMOJIS = ['⚔️', '🏹', '🛡️', '👑', '🏰', '🔥', '🏆', '⚔️', '🗡️', '🛡️']
 
-// === Avatar Entrance Animation ===
 function AvatarEntranceAnimation({ avatar, name, trigger }) {
   const [active, setActive] = useState(false)
-
   useEffect(() => {
     if (trigger) {
       setActive(true)
       setTimeout(() => setActive(false), 2500)
     }
   }, [trigger])
-
   if (!active) return null
-
-  // Map avatar to animation type
   const AVATAR_ANIMATIONS = {
     '🧙': { particle: '✨', effect: 'Fumée magique', class: 'anim-magic' },
     '🔮': { particle: '✨', effect: 'Fumée magique', class: 'anim-magic' },
@@ -1099,9 +907,7 @@ function AvatarEntranceAnimation({ avatar, name, trigger }) {
     '🌙': { particle: '⭐', effect: 'Étoiles', class: 'anim-stars' },
     '🗡️': { particle: '🗡️', effect: 'Lame', class: 'anim-blade' },
   }
-
   const anim = AVATAR_ANIMATIONS[avatar] || { particle: '✨', effect: 'Apparition', class: 'anim-magic' }
-
   return (
     <div className={`avatar-entrance ${anim.class}`}>
       <div className="avatar-entrance-figure">
@@ -1117,7 +923,6 @@ function AvatarEntranceAnimation({ avatar, name, trigger }) {
   )
 }
 
-// === Sound effects (Web Audio API) ===
 let audioCtx = null
 function getAudioCtx() {
   if (!audioCtx) {
@@ -1162,7 +967,6 @@ export function playSound(name) {
   }
 }
 
-
 function ConfettiOverlay() {
   const pieces = useMemo(() => {
     return Array.from({ length: 40 }, (_, i) => ({
@@ -1184,44 +988,24 @@ function ConfettiOverlay() {
         <span className="target-emoji">🎯</span>
       </div>
       {pieces.map((p) => (
-        <span
-          key={p.id}
-          className="confetti-piece"
-          style={{
-            left: `${p.left}%`,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-            fontSize: `${p.size}rem`,
-            transform: `rotate(${p.rotate}deg)`,
-          }}
-        >
-          {p.emoji}
-        </span>
+        <span key={p.id} className="confetti-piece" style={{ left: `${p.left}%`, animationDelay: `${p.delay}s`, animationDuration: `${p.duration}s`, fontSize: `${p.size}rem`, transform: `rotate(${p.rotate}deg)` }}>{p.emoji}</span>
       ))}
     </div>
   )
 }
 
-// === Monthly Recap (Parchemin Royal) ===
 function MonthlyRecap({ rounds, onOpenBanquet }) {
   const [show, setShow] = useState(false)
   const [recapSeen, setRecapSeen] = useState(() => {
     try {
       const month = new Date().getMonth()
       return sessionStorage.getItem('pari-lead-dev-recap-seen') === String(month)
-    } catch {
-      return false
-    }
+    } catch { return false }
   })
 
   const recap = useMemo(() => api.computeMonthlyRecap(rounds), [rounds])
 
-  // Show toast when recap becomes available and hasn't been seen
-  useEffect(() => {
-    if (recap && !recapSeen) {
-      // Badge stays visible until user opens the recap
-    }
-  }, [recap, recapSeen])
+  useEffect(() => {}, [recap, recapSeen])
 
   function openRecap() {
     setShow(true)
@@ -1264,7 +1048,6 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
             <button className="modal-close" onClick={() => setShow(false)}>✕</button>
             <h2>📜 Parchemin Royal</h2>
             <p className="modal-subtitle">Chroniques de {monthName}</p>
-
             <div className="recap-section">
               <div className="recap-item recap-late">
                 <span className="recap-icon">🐌</span>
@@ -1276,7 +1059,6 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
                   )}
                 </div>
               </div>
-
               <div className="recap-item recap-early">
                 <span className="recap-icon">⚡</span>
                 <div className="recap-text">
@@ -1287,7 +1069,6 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
                   )}
                 </div>
               </div>
-
               {recap.topPredictor && (
                 <div className="recap-item recap-predictor">
                   <span className="recap-icon">👑</span>
@@ -1297,7 +1078,6 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
                   </div>
                 </div>
               )}
-
               {recap.bestBet && (
                 <div className="recap-item recap-precise">
                   <span className="recap-icon">🎯</span>
@@ -1307,26 +1087,15 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
                   </div>
                 </div>
               )}
-
               <div className="recap-stats">
-                <div className="recap-stat">
-                  <span className="recap-stat-value">{recap.totalRounds}</span>
-                  <span className="recap-stat-label">Paris ce mois-ci</span>
-                </div>
-                <div className="recap-stat">
-                  <span className="recap-stat-value">{formatTime(recap.avgArrival)}</span>
-                  <span className="recap-stat-label">Heure d'arrivée moyenne</span>
-                </div>
+                <div className="recap-stat"><span className="recap-stat-value">{recap.totalRounds}</span><span className="recap-stat-label">Paris ce mois-ci</span></div>
+                <div className="recap-stat"><span className="recap-stat-value">{formatTime(recap.avgArrival)}</span><span className="recap-stat-label">Heure d'arrivée moyenne</span></div>
               </div>
             </div>
-
             <div style={{ textAlign: 'center', marginTop: 'var(--space-4)' }}>
               <ShareableParchment recap={recap} monthName={monthName} />
             </div>
-
-            <button className="btn btn-primary recap-close-btn" onClick={() => setShow(false)}>
-              ⚔️ Fermer le parchemin
-            </button>
+            <button className="btn btn-primary recap-close-btn" onClick={() => setShow(false)}>⚔️ Fermer le parchemin</button>
           </div>
         </div>
       )}
@@ -1334,7 +1103,6 @@ function MonthlyRecap({ rounds, onOpenBanquet }) {
   )
 }
 
-// === Medieval titles ===
 const MEDIEVAL_TITLES = [
   { min: 0, title: 'Vilain du village', icon: '🧑‍🌾' },
   { min: 1, title: 'Écuyer', icon: '🛡️' },
@@ -1347,16 +1115,12 @@ const MEDIEVAL_TITLES = [
 
 function getMedievalTitle(score) {
   let result = MEDIEVAL_TITLES[0]
-  for (const t of MEDIEVAL_TITLES) {
-    if (score >= t.min) result = t
-  }
+  for (const t of MEDIEVAL_TITLES) { if (score >= t.min) result = t }
   return result
 }
 
-// === Delay Calendar ===
 function DelayCalendar({ rounds }) {
   const [show, setShow] = useState(false)
-
   const monthDays = useMemo(() => {
     const now = new Date()
     const year = now.getFullYear()
@@ -1386,9 +1150,7 @@ function DelayCalendar({ rounds }) {
 
   return (
     <>
-      <button className="btn btn-secondary" onClick={() => setShow(true)}>
-        📅 Calendrier des retards
-      </button>
+      <button className="btn btn-secondary" onClick={() => setShow(true)}>📅 Calendrier des retards</button>
       {show && (
         <div className="modal-overlay" onClick={() => setShow(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -1397,16 +1159,10 @@ function DelayCalendar({ rounds }) {
             <p className="modal-subtitle">{new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
             <div className="calendar-grid">
               {monthDays.map((d) => (
-                <div
-                  key={d.day}
-                  className={`calendar-day ${d.maxHour !== null ? 'has-delay' : ''} ${d.maxHour >= 11 ? 'delay-late' : d.maxHour >= 10 ? 'delay-medium' : d.maxHour !== null ? 'delay-early' : ''}`}
-                  title={d.maxHour !== null ? `${d.date.toLocaleDateString('fr-FR')} - Arrivee: ${Math.floor(d.maxHour)}h${Math.round((d.maxHour % 1) * 60).toString().padStart(2, '0')}` : d.date.toLocaleDateString('fr-FR')}
-                >
+                <div key={d.day} className={`calendar-day ${d.maxHour !== null ? 'has-delay' : ''} ${d.maxHour >= 11 ? 'delay-late' : d.maxHour >= 10 ? 'delay-medium' : d.maxHour !== null ? 'delay-early' : ''}`} title={d.maxHour !== null ? `${d.date.toLocaleDateString('fr-FR')} - Arrivee: ${Math.floor(d.maxHour)}h${Math.round((d.maxHour % 1) * 60).toString().padStart(2, '0')}` : d.date.toLocaleDateString('fr-FR')}>
                   <span className="calendar-day-num">{d.day}</span>
                   {d.maxHour !== null && (
-                    <span className="calendar-day-icon">
-                      {d.maxHour >= 11 ? '⛈️' : d.maxHour >= 10 ? '🌧️' : '☀️'}
-                    </span>
+                    <span className="calendar-day-icon">{d.maxHour >= 11 ? '⛈️' : d.maxHour >= 10 ? '🌧️' : '☀️'}</span>
                   )}
                 </div>
               ))}
@@ -1418,63 +1174,27 @@ function DelayCalendar({ rounds }) {
   )
 }
 
-// === Daily Quests ===
 function DailyQuests({ rounds, userName }) {
   const [show, setShow] = useState(false)
-
   const quests = useMemo(() => {
     const today = new Date().toDateString()
     const todayRounds = rounds.filter((r) => {
       const d = new Date(r.createdAt || r.closedAt)
       return d.toDateString() === today && r.actualValue !== null
     })
-
     const playerBets = []
     todayRounds.forEach((r) => {
-      r.bets.forEach((b) => {
-        if (b.name === userName) {
-          playerBets.push({ ...b, actualValue: r.actualValue })
-        }
-      })
+      r.bets.forEach((b) => { if (b.name === userName) playerBets.push({ ...b, actualValue: r.actualValue }) })
     })
-
-    const winners = todayRounds.flatMap((r) =>
-      (r.winners || []).map((w) => {
-        const bet = r.bets.find((b) => b.id === w)
-        return bet ? bet.name : null
-      })
-    )
-
-    // Check consecutive wins
     let streak = 0
-    const sortedRounds = [...todayRounds].sort((a, b) =>
-      new Date(a.closedAt) - new Date(b.closedAt)
-    )
+    const sortedRounds = [...todayRounds].sort((a, b) => new Date(a.closedAt) - new Date(b.closedAt))
     for (const r of sortedRounds) {
-      const roundWinners = (r.winners || []).map((w) => {
-        const bet = r.bets.find((b) => b.id === w)
-        return bet ? bet.name : null
-      })
-      if (roundWinners.includes(userName)) {
-        streak++
-      } else {
-        break
-      }
+      const roundWinners = (r.winners || []).map((w) => { const bet = r.bets.find((b) => b.id === w); return bet ? bet.name : null })
+      if (roundWinners.includes(userName)) { streak++ } else { break }
     }
-
     return [
-      {
-        icon: '🎯',
-        name: 'Oracle precis',
-        desc: 'Predire a moins de 5 minutes',
-        done: playerBets.some((b) => Math.abs(b.value - b.actualValue) <= 5),
-      },
-      {
-        icon: '👑',
-        name: 'Double couronne',
-        desc: 'Gagner 2 fois de suite',
-        done: streak >= 2,
-      },
+      { icon: '🎯', name: 'Oracle precis', desc: 'Predire a moins de 5 minutes', done: playerBets.some((b) => Math.abs(b.value - b.actualValue) <= 5) },
+      { icon: '👑', name: 'Double couronne', desc: 'Gagner 2 fois de suite', done: streak >= 2 },
     ]
   }, [rounds, userName])
 
@@ -1482,9 +1202,7 @@ function DailyQuests({ rounds, userName }) {
 
   return (
     <>
-      <button className="btn btn-secondary" onClick={() => setShow(true)}>
-        ⚔️ Quetes du jour ({quests.filter((q) => q.done).length}/{quests.length})
-      </button>
+      <button className="btn btn-secondary" onClick={() => setShow(true)}>⚔️ Quetes du jour ({quests.filter((q) => q.done).length}/{quests.length})</button>
       {show && (
         <div className="modal-overlay" onClick={() => setShow(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -1495,10 +1213,7 @@ function DailyQuests({ rounds, userName }) {
               {quests.map((q, i) => (
                 <div key={i} className={`quest-item ${q.done ? 'done' : ''}`}>
                   <span className="quest-icon">{q.done ? '✅' : q.icon}</span>
-                  <div>
-                    <strong>{q.name}</strong>
-                    <p>{q.desc}</p>
-                  </div>
+                  <div><strong>{q.name}</strong><p>{q.desc}</p></div>
                 </div>
               ))}
             </div>
@@ -1509,7 +1224,6 @@ function DailyQuests({ rounds, userName }) {
   )
 }
 
-// === Royal Punchlines ===
 const ROYAL_PUNCHLINES = [
   'Le roi a parle, les devins tremblent !',
   'Que la fortune vous sourie, noble devin.',
@@ -1523,11 +1237,8 @@ const ROYAL_PUNCHLINES = [
   'Les hirondelles annoncent une grande victoire.',
 ]
 
-function getPunchline() {
-  return ROYAL_PUNCHLINES[Math.floor(Math.random() * ROYAL_PUNCHLINES.length)]
-}
+function getPunchline() { return ROYAL_PUNCHLINES[Math.floor(Math.random() * ROYAL_PUNCHLINES.length)] }
 
-// === Monthly Tournament ===
 function MonthlyTournament({ rounds }) {
   const monthRounds = useMemo(() => {
     const now = new Date()
@@ -1554,7 +1265,6 @@ function MonthlyTournament({ rounds }) {
   }, [monthRounds])
 
   if (tournamentLeaderboard.length === 0) return null
-
   const champion = tournamentLeaderboard[0]
 
   return (
@@ -1570,15 +1280,12 @@ function MonthlyTournament({ rounds }) {
         ))}
       </div>
       {champion && (
-        <p className="tournament-champion">
-          👑 Champion: {champion.avatar} {champion.name} avec {champion.wins} victoire{champion.wins > 1 ? 's' : ''} !
-        </p>
+        <p className="tournament-champion">👑 Champion: {champion.avatar} {champion.name} avec {champion.wins} victoire{champion.wins > 1 ? 's' : ''} !</p>
       )}
     </div>
   )
 }
 
-// === Shareable Parchment ===
 function ShareableParchment({ recap, monthName }) {
   const [copied, setCopied] = useState(false)
 
@@ -1596,7 +1303,6 @@ function ShareableParchment({ recap, monthName }) {
 📊 Total: ${recap.totalRounds} paris - Moyenne: ${formatTime(recap.avgArrival)}
 
 Via Pari Lead Dev`
-
     try {
       navigator.clipboard.writeText(text)
       setCopied(true)
@@ -1605,25 +1311,16 @@ Via Pari Lead Dev`
   }
 
   return (
-    <button className="btn btn-primary" onClick={copyParchment}>
-      {copied ? '✅ Copie !' : '📋 Copier le parchemin'}
-    </button>
+    <button className="btn btn-primary" onClick={copyParchment}>{copied ? '✅ Copie !' : '📋 Copier le parchemin'}</button>
   )
 }
 
-// === Banquet Animation ===
 function BanquetAnimation({ trigger }) {
   const [active, setActive] = useState(false)
-
   useEffect(() => {
-    if (trigger) {
-      setActive(true)
-      setTimeout(() => setActive(false), 3000)
-    }
+    if (trigger) { setActive(true); setTimeout(() => setActive(false), 3000) }
   }, [trigger])
-
   if (!active) return null
-
   return (
     <div className="banquet-overlay">
       <div className="banquet-trumpet">🎺</div>
@@ -1633,10 +1330,8 @@ function BanquetAnimation({ trigger }) {
   )
 }
 
-// === Player Joust ===
 function PlayerJoust({ leaderboard }) {
   if (leaderboard.length < 2) return null
-
   const [p1, p2] = leaderboard
   const duels = [
     { icon: '⚔️', label: 'Duel de l\'aube' },
@@ -1644,7 +1339,6 @@ function PlayerJoust({ leaderboard }) {
     { icon: '🔮', label: 'Sortilege des mages' },
   ]
   const duel = duels[Math.floor(Math.random() * duels.length)]
-
   return (
     <div className="joust-card">
       <h3>{duel.icon} {duel.label}</h3>
@@ -1665,21 +1359,17 @@ function PlayerJoust({ leaderboard }) {
   )
 }
 
-// === Kingdom Weather ===
 function getKingdomWeather(rounds) {
   const closed = rounds.filter((r) => r.type === 'time' && r.actualValue !== null)
   if (closed.length === 0) return { icon: '☀️', label: 'Ciel degage', class: 'weather-sunny' }
-
   const latest = closed.reduce((a, b) => (a.actualValue > b.actualValue ? a : b))
   const hour = Math.floor(latest.actualValue / 60)
-
   if (hour >= 11) return { icon: '⛈️', label: 'Tempete de retard', class: 'weather-storm' }
   if (hour >= 10) return { icon: '🌧️', label: 'Pluie d\'impatience', class: 'weather-rain' }
   if (hour >= 9) return { icon: '⛅', label: 'Nuages d\'attente', class: 'weather-cloudy' }
   return { icon: '☀️', label: 'Soleil matinal', class: 'weather-sunny' }
 }
 
-// === Funny trophies ===
 const TROPHIES = [
   { id: 'pile', icon: '🎯', name: 'Pile à l\'heure', desc: 'Prédiction exacte (0 min d\'écart)' },
   { id: 'proche', icon: '🏹', name: 'Presque devin', desc: 'Prédiction à 5 min ou moins' },
@@ -1715,19 +1405,14 @@ function computeTrophies(rounds, playerName) {
   return TROPHIES.map((t) => ({ ...t, unlocked: unlocked.has(t.id) }))
 }
 
-// === Achievement Chest ===
 function AchievementChest({ rounds, playerName }) {
   const [show, setShow] = useState(false)
   const trophies = useMemo(() => computeTrophies(rounds, playerName), [rounds, playerName])
   const unlockedCount = trophies.filter((t) => t.unlocked).length
-
   if (!playerName) return null
-
   return (
     <>
-      <button className="btn btn-secondary" onClick={() => setShow(true)}>
-        🎁 Coffre aux exploits ({unlockedCount}/{trophies.length})
-      </button>
+      <button className="btn btn-secondary" onClick={() => setShow(true)}>🎁 Coffre aux exploits ({unlockedCount}/{trophies.length})</button>
       {show && (
         <div className="modal-overlay" onClick={() => setShow(false)}>
           <div className="modal achievement-modal" onClick={(e) => e.stopPropagation()}>
@@ -1750,7 +1435,6 @@ function AchievementChest({ rounds, playerName }) {
   )
 }
 
-// === Kingdom Leaderboard (Classement + Carte du royaume) ===
 function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFame, userName }) {
   const maxScore = Math.max(...leaderboard.map((e) => e.score), 1)
   const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -1769,17 +1453,12 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
       </div>
       <p className="kingdom-punchline">{punchline}</p>
 
-      {/* Carte du royaume */}
       <div className="kingdom-map">
-        {/* Village (start) */}
         <div className="kingdom-start">
           <span className="kingdom-icon">🏘️</span>
           <span className="kingdom-label">Village</span>
         </div>
-
-        {/* Path with players */}
         <div className="kingdom-path">
-          {/* Castle at the end */}
           <div className="kingdom-castle">
             <span className="kingdom-icon">🏰</span>
             <span className="kingdom-label">Château GIT</span>
@@ -1789,34 +1468,23 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
             const rank = i + 1
             const isLeader = rank === 1
             return (
-              <div
-                key={entry.name}
-                className={`kingdom-player rank-${rank}`}
-                style={{ left: `${Math.max(5, Math.min(progress - 3, 88))}%`, top: `${(i % 3) * 35 + 10}px` }}
-                onClick={() => onPlayerClick(entry)}
-                title={`${entry.name} — ${entry.score} pt${entry.score > 1 ? 's' : ''} — ${getMedievalTitle(entry.score).title} — ${getPlayerHouse(entry.name).name}`}
-              >
+              <div key={entry.name} className={`kingdom-player rank-${rank}`} style={{ left: `${Math.max(5, Math.min(progress - 3, 88))}%`, top: `${(i % 3) * 35 + 10}px` }} onClick={() => onPlayerClick(entry)} title={`${entry.name} — ${entry.score} pt${entry.score > 1 ? 's' : ''} — ${getMedievalTitle(entry.score).title} — ${getPlayerHouse(entry.name).name}`}>
                 <span className="kingdom-player-avatar">{entry.avatar || '🛡️'}</span>
                 {isLeader && <span className="kingdom-crown">👑</span>}
-                <span className="kingdom-player-tooltip">
-                  {entry.name} — {entry.score} pt{entry.score > 1 ? 's' : ''}
-                </span>
+                <span className="kingdom-player-tooltip">{entry.name} — {entry.score} pt{entry.score > 1 ? 's' : ''}</span>
               </div>
             )
           })}
         </div>
       </div>
 
-      {/* Mobile list fallback */}
       <div className="kingdom-list">
         {leaderboard.map((entry, i) => (
           <div key={entry.name} className={`leaderboard-item rank-${i + 1}`}>
             <div className="leaderboard-rank">{i + 1}</div>
             <span className="leaderboard-avatar">{entry.avatar || '🛡️'}</span>
             <button className="leaderboard-name clickable" onClick={() => onPlayerClick(entry)}>{entry.name}</button>
-            {entry.currentStreak >= 2 && (
-              <span className="streak-badge">🔥 {entry.currentStreak}</span>
-            )}
+            {entry.currentStreak >= 2 && (<span className="streak-badge">🔥 {entry.currentStreak}</span>)}
             <div className="leaderboard-score">{entry.score} pt{entry.score > 1 ? 's' : ''}</div>
             <div className="leaderboard-title">{getMedievalTitle(entry.score).icon} {getMedievalTitle(entry.score).title}</div>
             <div className="leaderboard-house">{getPlayerHouse(entry.name).icon} {getPlayerHouse(entry.name).name}</div>
@@ -1824,11 +1492,9 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
         ))}
       </div>
 
-      {/* Joust + Tournament */}
       <PlayerJoust leaderboard={leaderboard} />
       <MonthlyTournament rounds={rounds} />
 
-      {/* Fun cards grid */}
       <div className="kingdom-fun-grid">
         <RoyalTribunal rounds={rounds} />
         <WantedPoster rounds={rounds} />
@@ -1838,21 +1504,17 @@ function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFa
         <ExcuseMarket rounds={rounds} />
       </div>
 
-      {/* Actions */}
       <div className="header-actions" style={{ justifyContent: 'center', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
         <DailyQuests rounds={rounds} userName={userName} />
         <DelayCalendar rounds={rounds} />
         <AchievementChest rounds={rounds} playerName={userName} />
         <MonthlyRecap rounds={rounds} onOpenBanquet={() => setBanquetTrigger(true)} />
-        <button className="btn btn-secondary hall-of-fame-btn" onClick={onOpenHallOfFame}>
-          🏆 Hall of Fame
-        </button>
+        <button className="btn btn-secondary hall-of-fame-btn" onClick={onOpenHallOfFame}>🏆 Hall of Fame</button>
       </div>
     </div>
   )
 }
 
-// === Royal Tribunal ===
 const TRIBUNAL_VERDICTS = [
   { max: 0, verdict: 'acquitte', icon: '⚖️', text: "Le tribunal royal acquitte le Lead Dev. Arrive pile a l'heure, une rarete digne des legendes." },
   { max: 15, verdict: 'rappel', icon: '⚖️', text: "Le tribunal rappelle le Lead Dev a l'ordre pour un retard de {delay} minutes. Le royaume lui accorde le benefice du doute." },
@@ -1866,15 +1528,11 @@ function RoyalTribunal({ rounds }) {
     if (closed.length === 0) return null
     return closed.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt))[0]
   }, [rounds])
-
   if (!lastClosed) return null
-
   const delay = computeDelayMinutes(lastClosed.actualValue)
   if (delay === null) return null
-
   const verdict = TRIBUNAL_VERDICTS.find((v) => delay <= v.max) || TRIBUNAL_VERDICTS[TRIBUNAL_VERDICTS.length - 1]
   const text = verdict.text.replace('{delay}', delay)
-
   return (
     <div className="fun-card">
       <div className="fun-card-title">{verdict.icon} Tribunal Royal du Retard</div>
@@ -1884,23 +1542,14 @@ function RoyalTribunal({ rounds }) {
   )
 }
 
-// === Wanted Poster ===
 const WANTED_LOCATIONS = [
-  'pres de la machine a cafe',
-  'dans les toilettes du 2e etage',
-  "devant le frigo de l'open space",
-  'pres de la baie vitree',
-  "dans l'ascenseur",
-  'au distributeur de snacks',
-  'dans la salle de reunion abandonnee',
-  'pres du radiateur qui fait du bruit',
+  'pres de la machine a cafe', 'dans les toilettes du 2e etage', "devant le frigo de l'open space",
+  'pres de la baie vitree', "dans l'ascenseur", 'au distributeur de snacks',
+  'dans la salle de reunion abandonnee', 'pres du radiateur qui fait du bruit',
 ]
 const WANTED_DESCRIPTIONS = [
-  'cheveux en bataille, semblait perdu',
-  'regard vitreux, marmonnait des excuses',
-  'sac a dos ouvert, trail de cafe derriere lui',
-  'essouffle, cravate de travers',
-  'yeux mi-clos, cherche son badge',
+  'cheveux en bataille, semblait perdu', 'regard vitreux, marmonnait des excuses',
+  'sac a dos ouvert, trail de cafe derriere lui', 'essouffle, cravate de travers', 'yeux mi-clos, cherche son badge',
 ]
 
 function WantedPoster({ rounds }) {
@@ -1909,39 +1558,29 @@ function WantedPoster({ rounds }) {
     if (closed.length === 0) return null
     return closed.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt))[0]
   }, [rounds])
-
   if (!lastClosed) return null
-
   const dateStr = new Date(lastClosed.closedAt).toDateString()
   const locIndex = dateStr.length % WANTED_LOCATIONS.length
   const descIndex = dateStr.length % WANTED_DESCRIPTIONS.length
-
   return (
     <div className="fun-card wanted-card">
       <div className="fun-card-title">🔎 Avis de Recherche</div>
       <div className="fun-card-value">Le Lead Dev</div>
-      <div className="fun-card-muted">
-        Vu pour la dernière fois {WANTED_LOCATIONS[locIndex]}, {WANTED_DESCRIPTIONS[descIndex]}.
-      </div>
+      <div className="fun-card-muted">Vu pour la dernière fois {WANTED_LOCATIONS[locIndex]}, {WANTED_DESCRIPTIONS[descIndex]}.</div>
     </div>
   )
 }
 
-// === Feudal Tax ===
 function FeudalTax({ rounds }) {
   const lastClosed = useMemo(() => {
     const closed = rounds.filter((r) => r.status === 'closed' && r.actualValue !== null)
     if (closed.length === 0) return null
     return closed.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt))[0]
   }, [rounds])
-
   if (!lastClosed) return null
-
   const delay = computeDelayMinutes(lastClosed.actualValue)
   if (delay === null || delay === 0) return null
-
   const tax = delay * 2
-
   return (
     <div className="fun-card">
       <div className="fun-card-title">💰 Taxe Féodale du Retard</div>
@@ -1951,7 +1590,6 @@ function FeudalTax({ rounds }) {
   )
 }
 
-// === Carrier Pigeon ===
 const PIGEON_MESSAGES = [
   'Coop coop ! Le Lead Dev a ete apercu pres de la taverne CI/CD.',
   'Le pigeon rapporte un retard suspect dans les plaines du stand-up.',
@@ -1967,7 +1605,6 @@ function CarrierPigeon({ rounds }) {
     const idx = dateStr.length % PIGEON_MESSAGES.length
     return [PIGEON_MESSAGES[idx]]
   }, [])
-
   return (
     <div className="fun-card pigeon-card">
       <div className="fun-card-title">🐦 Pigeon Voyageur</div>
@@ -1977,7 +1614,6 @@ function CarrierPigeon({ rounds }) {
   )
 }
 
-// === Dungeon of Shame ===
 function DungeonOfShame({ rounds }) {
   const worstBet = useMemo(() => {
     const closed = rounds.filter((r) => r.status === 'closed' && r.actualValue !== null && r.bets.length > 0)
@@ -1987,17 +1623,12 @@ function DungeonOfShame({ rounds }) {
     closed.forEach((r) => {
       r.bets.forEach((b) => {
         const diff = Math.abs(b.value - r.actualValue)
-        if (diff > worstDiff) {
-          worstDiff = diff
-          worst = { name: b.name, avatar: b.avatar, diff: Math.round(diff) }
-        }
+        if (diff > worstDiff) { worstDiff = diff; worst = { name: b.name, avatar: b.avatar, diff: Math.round(diff) } }
       })
     })
     return worst
   }, [rounds])
-
   if (!worstBet) return null
-
   return (
     <div className="fun-card dungeon-card">
       <div className="fun-card-title">🏰 Donjon de la Honte</div>
@@ -2007,7 +1638,6 @@ function DungeonOfShame({ rounds }) {
   )
 }
 
-// === Medieval Houses ===
 const HOUSES = [
   { name: 'Maison du Crépuscule', icon: '🌙' },
   { name: 'Maison du Fort', icon: '🏰' },
@@ -2018,28 +1648,13 @@ const HOUSES = [
 function getPlayerHouse(name) {
   if (!name) return HOUSES[0]
   let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0
-  }
+  for (let i = 0; i < name.length; i++) { hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0 }
   return HOUSES[Math.abs(hash) % HOUSES.length]
 }
 
-// === Excuse Market ===
-const EXCUSES_SMALL = [
-  'Le cafe etait trop chaud',
-  'Le bus etait en avance',
-  "J'ai retrouve mon badge sous le canape",
-]
-const EXCUSES_MEDIUM = [
-  "Le reveil n'a pas sonne",
-  'Le chat a eteint mon reveil',
-  "Le bus n'est jamais passe",
-]
-const EXCUSES_LARGE = [
-  'Le dragon du peripherique a attaque',
-  "Un chevalier m'a defie en duel sur le chemin",
-  'Le pont-levis etait leve',
-]
+const EXCUSES_SMALL = ['Le cafe etait trop chaud', 'Le bus etait en avance', "J'ai retrouve mon badge sous le canape"]
+const EXCUSES_MEDIUM = ["Le reveil n'a pas sonne", 'Le chat a eteint mon reveil', "Le bus n'est jamais passe"]
+const EXCUSES_LARGE = ['Le dragon du peripherique a attaque', "Un chevalier m'a defie en duel sur le chemin", 'Le pont-levis etait leve']
 
 function ExcuseMarket({ rounds }) {
   const lastClosed = useMemo(() => {
@@ -2066,64 +1681,14 @@ function ExcuseMarket({ rounds }) {
     <div className="fun-card">
       <div className="fun-card-title">🖤 Marché Noir des Excuses</div>
       <div className="fun-card-muted">
-        {excuses.map((e, i) => (
-          <div key={i} className="excuse-item">— {e}</div>
-        ))}
+        {excuses.map((e, i) => (<div key={i} className="excuse-item">— {e}</div>))}
       </div>
     </div>
   )
 }
 
-// === Readme Guide Modal (mandatory) ===
-function ReadmeGuideModal({ open, onNext }) {
-  if (!open) return null
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal rules-modal readme-guide-modal" onClick={(e) => e.stopPropagation()}>
-        <h2>📖 Le Grand Livre du Royaume</h2>
-        <p className="modal-subtitle">Guide royal de l'utilisateur</p>
-
-        <div className="rules-section">
-          <h3>👋 Bienvenue, noble voyageur</h3>
-          <p>Si tu viens d'arriver dans ce royaume, voici comment utiliser l'application étape par étape.</p>
-        </div>
-
-        <div className="rules-section">
-          <h3>🎯 Le but</h3>
-          <p>Devinez l'heure d'arrivée du Suprême Lead Dev. Celui dont la prédiction est la plus proche de l'heure réelle remporte la victoire et gagne des points de renommée.</p>
-        </div>
-
-        <div className="rules-section">
-          <h3>📝 Comment jouer</h3>
-          <ol className="rules-list">
-            <li><strong>Choisir son identité</strong> : au premier lancement, choisis ton avatar et ton pseudo. Ils te suivront dans toute ton aventure.</li>
-            <li><strong>Lire le README</strong> : ce guide que tu lis maintenant est obligatoire.</li>
-            <li><strong>Lire les règles</strong> : après ce guide, les règles du jeu s'affichent. Lecture obligatoire.</li>
-            <li><strong>Créer un pari</strong> : clique sur « + Nouveau pari » et donne-lui un nom.</li>
-            <li><strong>Parier une heure</strong> : saisis l'heure d'arrivée prévue. Formats : <code>9.30</code>, <code>9:30</code>, <code>9h30</code>, <code>10</code>.</li>
-            <li><strong>Clôturer</strong> : quand le Lead Dev arrive, saisis l'heure réelle. L'app calcule le gagnant.</li>
-            <li><strong>Explorer le Royaume</strong> : carte, météo, joutes, quêtes, coffre, tribunal, pigeon, donjon, marché noir.</li>
-          </ol>
-        </div>
-
-        <div className="rules-section">
-          <h3>⏰ Le retard à partir de 9h35</h3>
-          <p>Le royaume commence à compter le retard du Lead Dev à partir de <strong>9h35</strong>, l'heure officielle de début. Si le Lead Dev arrive à 10h02, son retard est de <strong>27 minutes</strong>. S'il arrive avant 9h35, il est « en avance ».</p>
-        </div>
-
-        <button className="btn btn-primary" style={{ marginTop: 'var(--space-4)', width: '100%', justifyContent: 'center' }} onClick={onNext}>
-          ⚔️ J'ai lu le README royal — voir les règles
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// === Game Rules Modal (Code du Royaume) ===
 function GameRulesModal({ open, onClose, mandatory = false }) {
   if (!open) return null
-
   return (
     <div className="modal-overlay" onClick={mandatory ? undefined : onClose}>
       <div className="modal rules-modal" onClick={(e) => e.stopPropagation()}>
@@ -2156,9 +1721,7 @@ function GameRulesModal({ open, onClose, mandatory = false }) {
           <h3>👑 Titres de noblesse</h3>
           <p>Plus tu gagnes de points, plus ton titre évolue dans le royaume :</p>
           <table className="rules-table">
-            <thead>
-              <tr><th>Score</th><th>Titre</th></tr>
-            </thead>
+            <thead><tr><th>Score</th><th>Titre</th></tr></thead>
             <tbody>
               <tr><td>0</td><td>🧑‍🌾 Vilain du village</td></tr>
               <tr><td>1+</td><td>🛡️ Écuyer</td></tr>
@@ -2202,7 +1765,6 @@ function GameRulesModal({ open, onClose, mandatory = false }) {
   )
 }
 
-// === Onboarding Modal (mandatory, no skip) ===
 function OnboardingModal({ userName, userAvatar, onSave }) {
   const [name, setName] = useState(userName || '')
   const [avatar, setAvatar] = useState(userAvatar || AVATARS[0].emoji)
@@ -2219,26 +1781,14 @@ function OnboardingModal({ userName, userAvatar, onSave }) {
 			<p className="modal-subtitle">Choisis ton nom et ton avatar pour commencer l'aventure</p>
         <div className="onboarding-avatar-grid">
           {AVATARS.map((a) => (
-            <button
-              key={a.emoji}
-              className={`onboarding-avatar-btn ${avatar === a.emoji ? 'selected' : ''}`}
-              onClick={() => setAvatar(a.emoji)}
-              title={a.name}
-            >
+            <button key={a.emoji} className={`onboarding-avatar-btn ${avatar === a.emoji ? 'selected' : ''}`} onClick={() => setAvatar(a.emoji)} title={a.name}>
               <span className="onboarding-avatar-emoji">{a.emoji}</span>
               <span className="onboarding-avatar-name">{a.name}</span>
             </button>
           ))}
         </div>
         <div className="onboarding-name-section">
-          <input
-            type="text"
-            placeholder="Ton prénom"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-            autoFocus
-          />
+          <input type="text" placeholder="Ton prénom" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSave()} autoFocus />
           <button className="btn btn-primary" onClick={handleSave} disabled={!name.trim()}>
 				⚔️ Commencer l'aventure
           </button>

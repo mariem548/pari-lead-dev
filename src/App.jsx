@@ -285,7 +285,7 @@ export default function App() {
       triggerConfetti()
       playSound('win')
       if (winnerNames.length > 0) {
-        showToast(`🏆 ${winnerNames.join(', ')} ${winnerNames.length > 1 ? 'gagnent' : 'gagne'} ! ${getPunchline()}`, 'success')
+        showToast(`🏆 ${winnerNames.join(', ')} ${winnerNames.length > 1 ? 'gagnent' : 'gagne'} !`, 'success')
       }
     } catch (e) {
       setError('Erreur: ' + e.message)
@@ -1224,21 +1224,6 @@ function DailyQuests({ rounds, userName }) {
   )
 }
 
-const ROYAL_PUNCHLINES = [
-  'Le roi a parle, les devins tremblent !',
-  'Que la fortune vous sourie, noble devin.',
-  'L\'heure du jugement a sonne !',
-  'Le sort en est jete, les paris sont clos.',
-  'Aujourd\'hui, la providence a choisi son champion.',
-  'Les astres ont parle, les taverne se taisent.',
-  'Le banquier du royaume a rendu son verdict.',
-  'La couronne du devin brille de mille feux !',
-  'Un nouveau prophetes entre dans la legende.',
-  'Les hirondelles annoncent une grande victoire.',
-]
-
-function getPunchline() { return ROYAL_PUNCHLINES[Math.floor(Math.random() * ROYAL_PUNCHLINES.length)] }
-
 function MonthlyTournament({ rounds }) {
   const monthRounds = useMemo(() => {
     const now = new Date()
@@ -1359,17 +1344,6 @@ function PlayerJoust({ leaderboard }) {
   )
 }
 
-function getKingdomWeather(rounds) {
-  const closed = rounds.filter((r) => r.type === 'time' && r.actualValue !== null)
-  if (closed.length === 0) return { icon: '☀️', label: 'Ciel degage', class: 'weather-sunny' }
-  const latest = closed.reduce((a, b) => (a.actualValue > b.actualValue ? a : b))
-  const hour = Math.floor(latest.actualValue / 60)
-  if (hour >= 11) return { icon: '⛈️', label: 'Tempete de retard', class: 'weather-storm' }
-  if (hour >= 10) return { icon: '🌧️', label: 'Pluie d\'impatience', class: 'weather-rain' }
-  if (hour >= 9) return { icon: '⛅', label: 'Nuages d\'attente', class: 'weather-cloudy' }
-  return { icon: '☀️', label: 'Soleil matinal', class: 'weather-sunny' }
-}
-
 const TROPHIES = [
   { id: 'pile', icon: '🎯', name: 'Pile à l\'heure', desc: 'Prédiction exacte (0 min d\'écart)' },
   { id: 'proche', icon: '🏹', name: 'Presque devin', desc: 'Prédiction à 5 min ou moins' },
@@ -1438,20 +1412,13 @@ function AchievementChest({ rounds, playerName }) {
 function KingdomLeaderboard({ leaderboard, onPlayerClick, rounds, onOpenHallOfFame, userName }) {
   const maxScore = Math.max(...leaderboard.map((e) => e.score), 1)
   const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-  const weather = getKingdomWeather(rounds)
-  const [punchline] = useState(() => getPunchline())
   const [banquetTrigger, setBanquetTrigger] = useState(false)
 
   return (
-    <div className={`kingdom-view ${weather.class}`}>
+    <div className="kingdom-view">
       <BanquetAnimation trigger={banquetTrigger} />
       <h2 className="section-title">👑 Royaume des Héros</h2>
       <p className="kingdom-date">{today}</p>
-      <div className="kingdom-weather">
-        <span className="weather-icon">{weather.icon}</span>
-        <span className="weather-label">{weather.label}</span>
-      </div>
-      <p className="kingdom-punchline">{punchline}</p>
 
       <div className="kingdom-map">
         <div className="kingdom-start">
@@ -1739,7 +1706,6 @@ function GameRulesModal({ open, onClose, mandatory = false }) {
           <p>L'onglet <strong>Royaume</strong> contient tout ton aventure :</p>
           <ul className="rules-list">
             <li><strong>Carte du royaume</strong> : vois les joueurs avancer du Village jusqu'au Château GIT selon leur score.</li>
-            <li><strong>Météo du royaume</strong> : le temps change selon l'heure d'arrivée du Lead Dev (soleil s'il est tôt, tempête s'il est très en retard).</li>
             <li><strong>Joutes</strong> : les deux meilleurs joueurs s'affrontent dans un duel quotidien.</li>
             <li><strong>Quêtes du jour</strong> : complète des challenges (Oracle précis, Double couronne).</li>
             <li><strong>Coffre aux exploits</strong> : débloque des trophées (Pile à l'heure, Prophète du café, etc.).</li>

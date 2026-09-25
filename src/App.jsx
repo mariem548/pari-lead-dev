@@ -2112,16 +2112,6 @@ function ReadmeGuideModal({ open, onNext }) {
           <p>Le royaume commence à compter le retard du Lead Dev à partir de <strong>9h35</strong>, l'heure officielle de début. Si le Lead Dev arrive à 10h02, son retard est de <strong>27 minutes</strong>. S'il arrive avant 9h35, il est « en avance ».</p>
         </div>
 
-        <div className="rules-section">
-          <h3>🎨 Que nul ne croie que ces armoiries furent dessinées au hasard</h3>
-          <p>Que nul ne croie que ces armoiries furent dessinées au hasard. Chaque détail de ce royaume, du château GIT sculpté dans l'or jusqu'au plus humble des avatars, est le fruit de maintes délibérations au conseil des anciens.</p>
-          <p>Le logo, ce fier château où s'inscrit « GIT » en lettres d'or, ne fut pas gravé en un jour. Les épées croisées qui le gardent furent forgées dans les flammes de mille débats. Le chevalier qui veille sur le royaume ne fut pas choisi par hasard : son destrier, sa cape, sa lance, tout fut pesé, mesuré, discuté.</p>
-          <p>Les douze avatars — le Chevalier, l'Archer, le Mage, le Roi, le Garde, le Guerrier, l'Assassin, le Scribe, le Seigneur, le Dragonnier, le Pyromancien et la Sorcière — chacun fut examiné, débattu, adopté ou rejeté lors de longues assemblées. Nul ne fut admis sans l'accord du conseil.</p>
-          <p>Les blasons des maisons — Crépuscule, Fort, Dragon et Taverne — furent dessinés à la plume, effacés, redessinés. Les titres de noblesse, du Vilain du village au Souverain du Retard, furent calibrés avec la précision d'un horloger royal.</p>
-          <p>Les punchlines, les excuses du Marché Noir, les messages du Pigeon Voyageur : chaque mot fut soupesé, goûté, recraché parfois, jusqu'à ce que la forme parfaite fût trouvée.</p>
-          <p>Que les sceptiques le sachent : même la couleur du parchemin, même l'épaisseur de la bordure dorée, même le choix entre une épée et une lance pour le gardien du château — tout, absolument tout, est le fruit d'une réflexion profonde, patiente et acharnée.</p>
-        </div>
-
         <button className="btn btn-primary" style={{ marginTop: 'var(--space-4)', width: '100%', justifyContent: 'center' }} onClick={onNext}>
           ⚔️ J'ai lu le README royal — voir les règles
         </button>
